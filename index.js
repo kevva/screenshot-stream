@@ -59,7 +59,9 @@ module.exports = function (url, size, opts) {
 			return;
 		}
 
-		stream.emit('error', new Error(data));
+		if (data.trim().length) {
+			stream.emit('error', new Error(data));
+		}
 	});
 
 	return stream;
