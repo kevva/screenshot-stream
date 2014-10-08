@@ -1,6 +1,7 @@
 'use strict';
 
 var base64 = require('base64-stream');
+var dargs = require('dargs');
 var path = require('path');
 var parseCookie = require('parse-cookie-phantomjs');
 var phantomjs = require('phantomjs').path;
@@ -29,7 +30,20 @@ module.exports = function (url, size, opts) {
 		JSON.stringify(opts)
 	];
 
-	var cp = spawn(phantomjs, args);
+	var excludes = [
+		'cookies',
+		'crop',
+		'customHeaders',
+		'delay',
+		'height',
+		'password',
+		'selector',
+		'url',
+		'username',
+		'width'
+	];
+
+	var cp = spawn(phantomjs, args.concat(dargs(opts, excludes)));
 	var stream = cp.stdout.pipe(base64.decode());
 
 	process.stderr.setMaxListeners(0);

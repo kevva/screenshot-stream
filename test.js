@@ -9,7 +9,8 @@ test('crop image using the `crop` option', function (t) {
 	t.plan(2);
 
 	var stream = screenshot('http://yeoman.io', '1024x768', {
-		crop: true
+		crop: true,
+		hello: true
 	});
 
 	stream.pipe(concat(function (data) {
