@@ -45,7 +45,7 @@ test('auth using the `username` and `password` options', function (t) {
 });
 
 test('have a `delay` option', function (t) {
-	t.plan(2);
+	t.plan(1);
 
 	var now = new Date();
 	var stream = screenshot('http://yeoman.io', '1024x768', {
