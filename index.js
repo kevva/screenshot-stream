@@ -19,6 +19,7 @@ var spawn = require('child_process').spawn;
 module.exports = function (url, size, opts) {
 	opts = opts || {};
 	opts.url = url;
+	opts.delay = opts.delay || 0;
 	opts.width = size.split(/x/i)[0];
 	opts.height = size.split(/x/i)[1];
 	opts.cookies = (opts.cookies || []).map(function (cookie) {
