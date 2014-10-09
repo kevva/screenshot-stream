@@ -2,8 +2,19 @@
 
 var concat = require('concat-stream');
 var imageSize = require('image-size');
+var isPng = require('is-png');
 var screenshot = require('./');
 var test = require('ava');
+
+test('generate screenshot', function (t) {
+	t.plan(1);
+
+	var stream = screenshot('http://yeoman.io', '1024x768');
+
+	stream.pipe(concat(function (data) {
+		t.assert(isPng(data));
+	}));
+});
 
 test('crop image using the `crop` option', function (t) {
 	t.plan(2);
