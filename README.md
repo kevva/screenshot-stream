@@ -56,6 +56,10 @@ Type: `String`
 
 Capture a specific DOM element.
 
+## CLI
+
+See the [pageres](https://github.com/sindresorhus/pageres#usage) CLI.
+
 ## License
 
 MIT © [Kevin Mårtensson](https://github.com/kevva)
