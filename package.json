@@ -25,7 +25,7 @@
     "dargs": "^2.0.3",
     "object-assign": "^1.0.0",
     "parse-cookie-phantomjs": "^1.0.0",
-    "phantomjs": "^1.9.10"
+    "phantomjs": "^1.9.2-6"
   },
   "devDependencies": {
     "ava": "0.0.4",
