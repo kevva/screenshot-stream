@@ -21,6 +21,36 @@ var stream = screenshot('http://google.com', '1024x768', {
 stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
 ```
 
+## API
+
+### screenshot(url, size, opts)
+
+#### url
+
+Type: `String`
+
+Add page to capture.
+
+#### size
+
+Type: `String`
+
+Set viewport size.
+
+#### opts
+
+Type: `Object`
+
+Define options to be used.
+
+#### .on('error', cb)
+
+PhantomJS errors.
+
+#### .on('warn', cb)
+
+Warnings with eg. page errors.
+
 ## Options
 
 ### cookies
@@ -50,11 +80,23 @@ Default: `0`
 
 Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
 
+### password
+
+Type: `String`
+
+Password for authenticating with HTTP auth.
+
 ### selector
 
 Type: `String`
 
 Capture a specific DOM element.
+
+### username
+
+Type: `String`
+
+Username for authenticating with HTTP auth.
 
 ## CLI
 
