@@ -17,6 +17,13 @@ var spawn = require('child_process').spawn;
  */
 
 module.exports = function (url, size, opts) {
+	if (!phantomjs) {
+		throw new Error([
+			'The automatic install of PhantomJS, which is used for generating the screenshots, seems to have failed.',
+			'Try installing it manually: http://phantomjs.org/download.html'
+		].join('\n'));
+	}
+
 	opts = opts || {};
 	opts.url = url;
 	opts.delay = opts.delay || 0;
