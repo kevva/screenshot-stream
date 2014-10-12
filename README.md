@@ -41,13 +41,17 @@ Set viewport size.
 
 Type: `Object`
 
-Define options to be used.
+Define [options](#options) to be used.
 
 #### .on('error', cb)
+
+Type: `Function`
 
 PhantomJS errors.
 
 #### .on('warn', cb)
+
+Type: `Function`
 
 Warnings with eg. page errors.
 
