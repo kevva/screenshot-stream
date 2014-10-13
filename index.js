@@ -61,6 +61,8 @@ module.exports = function (url, size, opts) {
 
 	cp.stderr.setEncoding('utf8');
 	cp.stderr.on('data', function (data) {
+		data = data.trim();
+
 		if (/ phantomjs\[/.test(data)) {
 			return;
 		}
@@ -70,7 +72,7 @@ module.exports = function (url, size, opts) {
 			return;
 		}
 
-		if (data.trim().length) {
+		if (data.length) {
 			stream.emit('error', new Error(data));
 		}
 	});
