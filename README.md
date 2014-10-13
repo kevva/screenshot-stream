@@ -2,11 +2,13 @@
 
 > Capture screenshot of a website and return it as a stream
 
+
 ## Install
 
 ```sh
 $ npm install --save screenshot-stream
 ```
+
 
 ## Usage
 
@@ -14,16 +16,15 @@ $ npm install --save screenshot-stream
 var fs = require('fs');
 var screenshot = require('screenshot-stream');
 
-var stream = screenshot('http://google.com', '1024x768', {
-	crop: true
-});
+var stream = screenshot('http://google.com', '1024x768', {crop: true});
 
 stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
 ```
 
+
 ## API
 
-### screenshot(url, size, opts)
+### screenshot(url, size, options)
 
 #### url
 
@@ -37,31 +38,26 @@ Type: `String`
 
 Set viewport size.
 
-#### opts
+#### options
 
 Type: `Object`
 
 Define [options](#options) to be used.
 
-#### .on('error', cb)
+#### .on('error', callback)
 
 Type: `Function`
 
 PhantomJS errors.
 
-#### .on('warn', cb)
+#### .on('warn', callback)
 
 Type: `Function`
 
 Warnings with eg. page errors.
 
+
 ## Options
-
-### cookies
-
-Type: `Array|Object`
-
-A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
 
 ### crop
 
@@ -70,13 +66,6 @@ Default: `false`
 
 Crop to the set height.
 
-### customHeaders
-
-Type: `Object`  
-Default: `{}`
-
-Set custom headers.
-
 ### delay
 
 Type: `Number` *(seconds)*  
@@ -84,17 +73,24 @@ Default: `0`
 
 Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
 
-### password
-
-Type: `String`
-
-Password for authenticating with HTTP auth.
-
 ### selector
 
 Type: `String`
 
 Capture a specific DOM element.
+
+### customHeaders
+
+Type: `Object`  
+Default: `{}`
+
+Set custom headers.
+
+### cookies
+
+Type: `Array|Object`
+
+A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
 
 ### username
 
@@ -102,9 +98,17 @@ Type: `String`
 
 Username for authenticating with HTTP auth.
 
+### password
+
+Type: `String`
+
+Password for authenticating with HTTP auth.
+
+
 ## CLI
 
 See the [pageres](https://github.com/sindresorhus/pageres#usage) CLI.
+
 
 ## License
 
