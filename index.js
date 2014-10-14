@@ -48,6 +48,7 @@ module.exports = function (url, size, opts) {
 		'crop',
 		'customHeaders',
 		'delay',
+		'es5shim',
 		'height',
 		'password',
 		'selector',
