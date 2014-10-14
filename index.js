@@ -2,6 +2,7 @@
 
 var base64 = require('base64-stream');
 var dargs = require('dargs');
+var es5 = require.resolve('es5-shim');
 var path = require('path');
 var parseCookie = require('parse-cookie-phantomjs');
 var phantomjs = require('phantomjs').path;
@@ -29,6 +30,7 @@ module.exports = function (url, size, opts) {
 
 	opts = opts || {};
 	opts.url = url;
+	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5);
 	opts.delay = opts.delay || 0;
 	opts.width = size.split(/x/i)[0];
 	opts.height = size.split(/x/i)[1];
