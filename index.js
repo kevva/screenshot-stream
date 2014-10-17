@@ -34,6 +34,7 @@ module.exports = function (url, size, opts) {
 	opts.delay = opts.delay || 0;
 	opts.width = size.split(/x/i)[0];
 	opts.height = size.split(/x/i)[1];
+	opts.format = opts.format || 'png';
 	opts.cookies = (opts.cookies || []).map(function (cookie) {
 		return typeof cookie === 'string' ? parseCookie(cookie) : cookie;
 	});
@@ -50,6 +51,7 @@ module.exports = function (url, size, opts) {
 		'crop',
 		'customHeaders',
 		'delay',
+		'format',
 		'es5shim',
 		'height',
 		'password',
