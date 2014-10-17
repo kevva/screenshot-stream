@@ -104,6 +104,13 @@ Type: `String`
 
 Password for authenticating with HTTP auth.
 
+### format
+
+Type: `String`  
+Default: `png`
+
+Set format to render the image as. Supported formats are `png` and `jpeg`.
+
 
 ## CLI
 
