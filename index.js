@@ -40,10 +40,11 @@ module.exports = function (url, size, opts) {
 	});
 
 	var args = [
-		path.join(__dirname, 'lib/index.js'),
-		JSON.stringify(opts),
 		'--ignore-ssl-errors=true',
-		'--local-to-remote-url-access=true'
+		'--local-to-remote-url-access=true',
+		'--ssl-protocol=any',
+		path.join(__dirname, 'lib/index.js'),
+		JSON.stringify(opts)
 	];
 
 	var excludes = [
