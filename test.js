@@ -9,7 +9,7 @@ var test = require('ava');
 test('generate screenshot', function (t) {
 	t.plan(1);
 
-	var stream = screenshot('http://yeoman.io', '1024x768');
+	var stream = screenshot('https://news.layervault.com/', '1024x768');
 
 	stream.pipe(concat(function (data) {
 		t.assert(isPng(data));
