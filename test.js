@@ -67,3 +67,17 @@ test('have a `delay` option', function (t) {
 		t.assert((new Date()) - now > 2000);
 	});
 });
+
+test('have a `dpi` option', function (t) {
+	t.plan(2);
+
+	var stream = screenshot('http://yeoman.io', '1024x768', {
+		crop: true,
+		scale: 2
+	});
+
+	stream.pipe(concat(function (data) {
+		t.assert(imageSize(data).width === 1024 * 2);
+		t.assert(imageSize(data).height === 768 * 2);
+	}));
+});

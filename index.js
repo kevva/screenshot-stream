@@ -32,8 +32,9 @@ module.exports = function (url, size, opts) {
 	opts.url = url;
 	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5);
 	opts.delay = opts.delay || 0;
-	opts.width = size.split(/x/i)[0];
-	opts.height = size.split(/x/i)[1];
+	opts.scale = opts.scale > 1 ? opts.scale : 1;
+	opts.width = size.split(/x/i)[0] * opts.scale;
+	opts.height = size.split(/x/i)[1] * opts.scale;
 	opts.format = opts.format || 'png';
 	opts.cookies = (opts.cookies || []).map(function (cookie) {
 		return typeof cookie === 'string' ? parseCookie(cookie) : cookie;
@@ -56,6 +57,7 @@ module.exports = function (url, size, opts) {
 		'es5shim',
 		'height',
 		'password',
+		'scale',
 		'selector',
 		'url',
 		'username',

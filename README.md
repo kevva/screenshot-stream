@@ -111,6 +111,13 @@ Default: `png`
 
 Set format to render the image as. Supported formats are `png` and `jpeg`.
 
+### scale
+
+Type: `Number`  
+Default: `1`
+
+Scale webpage `n` times.
+
 
 ## CLI
 
