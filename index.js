@@ -48,23 +48,7 @@ module.exports = function (url, size, opts) {
 		JSON.stringify(opts)
 	];
 
-	var excludes = [
-		'cookies',
-		'crop',
-		'customHeaders',
-		'delay',
-		'format',
-		'es5shim',
-		'height',
-		'password',
-		'scale',
-		'selector',
-		'url',
-		'username',
-		'width'
-	];
-
-	var cp = spawn(phantomjs, args.concat(dargs(opts, excludes)));
+	var cp = spawn(phantomjs, args);
 	var stream = cp.stdout.pipe(base64.decode());
 
 	process.stderr.setMaxListeners(0);
