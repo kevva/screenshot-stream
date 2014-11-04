@@ -2,6 +2,7 @@
 
 var concat = require('concat-stream');
 var imageSize = require('image-size');
+var isJpg = require('is-jpg');
 var isPng = require('is-png');
 var screenshot = require('./');
 var test = require('ava');
@@ -79,5 +80,17 @@ test('have a `dpi` option', function (t) {
 	stream.pipe(concat(function (data) {
 		t.assert(imageSize(data).width === 1024 * 2);
 		t.assert(imageSize(data).height === 768 * 2);
+	}));
+});
+
+test('have a `format` option', function (t) {
+	t.plan(1);
+
+	var stream = screenshot('http://yeoman.io', '1024x768', {
+		format: 'jpeg'
+	});
+
+	stream.pipe(concat(function (data) {
+		t.assert(isJpg(data));
 	}));
 });
