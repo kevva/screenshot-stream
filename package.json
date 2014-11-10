@@ -22,7 +22,6 @@
   "keywords": [],
   "dependencies": {
     "base64-stream": "^0.1.2",
-    "dargs": "^2.0.3",
     "es5-shim": "^4.0.3",
     "object-assign": "^1.0.0",
     "parse-cookie-phantomjs": "^1.0.0",
