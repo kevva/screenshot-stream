@@ -4,7 +4,7 @@ var concat = require('concat-stream');
 var imageSize = require('image-size');
 var isJpg = require('is-jpg');
 var isPng = require('is-png');
-var screenshot = require('./');
+var screenshot = require('../');
 var test = require('ava');
 var path = require('path');
 
@@ -44,17 +44,19 @@ test('capture a DOM element using the `selector` option', function (t) {
 	}));
 });
 
-test('capture a DOM element using `selector` option only after delay', function (t) {
+test('capture a DOM element using the `selector` option only after delay', function (t) {
 	t.plan(2);
 
-	var stream = screenshot(path.join(__dirname, 'test', 'delayShowing.html'), '1024x768', {
-		selector: '.someElement',
+	var fixture = path.join(__dirname, 'fixtures', 'test-delay-element.html');
+	var stream = screenshot(fixture, '1024x768', {
+		selector: 'div',
 		delay: 5
 	});
-	stream.on('data', function (data) {
+
+	stream.pipe(concat(function (data) {
 		t.assert(imageSize(data).width === 300);
 		t.assert(imageSize(data).height === 200);
-	});
+	}));
 });
 
 test('auth using the `username` and `password` options', function (t) {
