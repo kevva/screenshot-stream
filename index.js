@@ -1,7 +1,6 @@
 'use strict';
 
 var base64 = require('base64-stream');
-var dargs = require('dargs');
 var es5 = require.resolve('es5-shim');
 var path = require('path');
 var parseCookie = require('parse-cookie-phantomjs');
