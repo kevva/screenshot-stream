@@ -118,6 +118,12 @@ Default: `1`
 
 Scale webpage `n` times.
 
+### hide
+
+Type: `String|Array`  
+
+Selector or array of selectors of elements which should be hidden via `visibility: hidden` right before screen capturing
+
 
 ## CLI
 
