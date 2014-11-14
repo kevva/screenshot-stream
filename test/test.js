@@ -7,6 +7,7 @@ var isPng = require('is-png');
 var screenshot = require('../');
 var test = require('ava');
 var path = require('path');
+var getPixels = require('get-pixels');
 
 test('generate screenshot', function (t) {
 	t.plan(1);
@@ -108,5 +109,39 @@ test('have a `format` option', function (t) {
 
 	stream.pipe(concat(function (data) {
 		t.assert(isJpg(data));
+	}));
+});
+
+test('hide element provided through `hide` option', function(t) {
+	t.plan(2);
+
+	var fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
+
+	var stream = screenshot(fixture, '40x40',  {
+		hide: '.test1'
+	});
+
+	stream.pipe(concat(function(data) {
+		getPixels(data, 'image/png', function(err, pixels) {
+			t.assert(pixels.get(10, 10, 0) === 0);
+			t.assert(pixels.get(10, 10, 2) === 255);
+		});
+	}));
+});
+
+test('hide elements provided through `hide` option as an array', function(t) {
+	t.plan(2);
+
+	var fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
+
+	var stream = screenshot(fixture, '40x40',  {
+		hide: ['.test1', '.test2']
+	});
+
+	stream.pipe(concat(function(data) {
+		getPixels(data, 'image/png', function(err, pixels) {
+			t.assert(pixels.get(10, 10, 0) === 0);
+			t.assert(pixels.get(10, 30, 1) === 0);
+		});
 	}));
 });
