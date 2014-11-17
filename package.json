@@ -19,7 +19,18 @@
     "index.js",
     "lib"
   ],
-  "keywords": [],
+  "keywords": [
+    "image",
+    "page",
+    "phantom",
+    "phantomjs",
+    "resolution",
+    "screen",
+    "screenshot",
+    "size",
+    "stream",
+    "url"
+  ],
   "dependencies": {
     "base64-stream": "^0.1.2",
     "es5-shim": "^4.0.3",
