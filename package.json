@@ -30,6 +30,7 @@
   "devDependencies": {
     "ava": "0.0.4",
     "concat-stream": "^1.4.6",
+    "cookie": "^0.1.2",
     "image-size": "^0.3.3",
     "is-jpg": "^1.0.0",
     "is-png": "^1.0.0",

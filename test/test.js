@@ -6,6 +6,7 @@ var isJpg = require('is-jpg');
 var isPng = require('is-png');
 var PNG = require('png-js');
 var screenshot = require('../');
+var server = require('./fixtures/test-cookies.js');
 var test = require('ava');
 var path = require('path');
 
@@ -126,5 +127,45 @@ test('have a `format` option', function (t) {
 
 	stream.pipe(concat(function (data) {
 		t.assert(isJpg(data));
+	}));
+});
+
+test('send cookie', function (t) {
+	t.plan(1);
+
+	var srv = server(9000);
+	var stream = screenshot('http://localhost:9000', '100x100', {
+		cookies: ['color=black; Path=/; Domain=localhost']
+	});
+
+	stream.pipe(concat(function (data) {
+		srv.close();
+		var png = new PNG(data);
+
+		png.decode(function (pixels) {
+			t.assert(pixels[0] === 0);
+		});
+	}));
+});
+
+test('send cookie using an object', function (t) {
+	t.plan(1);
+
+	var srv = server(9001);
+	var stream = screenshot('http://localhost:9001', '100x100', {
+		cookies: [{
+			name: 'color',
+			value: 'black',
+			domain: 'localhost'
+		}]
+	});
+
+	stream.pipe(concat(function (data) {
+		srv.close();
+		var png = new PNG(data);
+
+		png.decode(function (pixels) {
+			t.assert(pixels[0] === 0);
+		});
 	}));
 });
