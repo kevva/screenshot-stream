@@ -4,6 +4,7 @@ var concat = require('concat-stream');
 var imageSize = require('image-size');
 var isJpg = require('is-jpg');
 var isPng = require('is-png');
+var PNG = require('png-js');
 var screenshot = require('../');
 var test = require('ava');
 var path = require('path');
@@ -56,6 +57,23 @@ test('capture a DOM element using the `selector` option only after delay', funct
 	stream.pipe(concat(function (data) {
 		t.assert(imageSize(data).width === 300);
 		t.assert(imageSize(data).height === 200);
+	}));
+});
+
+test('hide elements using the `hide` option', function (t) {
+	t.plan(1);
+
+	var fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
+	var stream = screenshot(fixture, '100x100', {
+		hide: ['div']
+	});
+
+	stream.pipe(concat(function (data) {
+		var png = new PNG(data);
+
+		png.decode(function (pixels) {
+			t.assert(pixels[0] === 255);
+		});
 	}));
 });
 

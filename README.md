@@ -79,6 +79,12 @@ Type: `String`
 
 Capture a specific DOM element.
 
+### hide
+
+Type: `Array`
+
+Hide an array of DOM elements.
+
 ### customHeaders
 
 Type: `Object`  
