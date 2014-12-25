@@ -66,7 +66,9 @@ module.exports = function (url, size, opts) {
 		}
 
 		if (data.length) {
-			stream.emit('error', new Error(data));
+			var err = new Error(data);
+			err.noStack = true;
+			stream.emit('error', err);
 		}
 	});
 
