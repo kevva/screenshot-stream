@@ -1,11 +1,9 @@
 'use strict';
-
+var path = require('path');
 var base64 = require('base64-stream');
 var es5 = require.resolve('es5-shim');
-var path = require('path');
 var parseCookie = require('parse-cookie-phantomjs');
-var phantomjs = require('phantomjs').path;
-var spawn = require('child_process').spawn;
+var phantomBridge = require('phantom-bridge');
 
 /**
  * Screenshot stream
@@ -17,16 +15,6 @@ var spawn = require('child_process').spawn;
  */
 
 module.exports = function (url, size, opts) {
-	if (!phantomjs) {
-		var err = new Error([
-			'The automatic install of PhantomJS, which is used for generating the screenshots, seems to have failed.',
-			'Try installing it manually: http://phantomjs.org/download.html'
-		].join('\n'));
-
-		err.noStack = true;
-		throw err;
-	}
-
 	opts = opts || {};
 	opts.url = url;
 	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5);
@@ -39,15 +27,13 @@ module.exports = function (url, size, opts) {
 		return typeof cookie === 'string' ? parseCookie(cookie) : cookie;
 	});
 
-	var args = [
+	var cp = phantomBridge(path.join(__dirname, 'lib/index.js'), [
 		'--ignore-ssl-errors=true',
 		'--local-to-remote-url-access=true',
 		'--ssl-protocol=any',
-		path.join(__dirname, 'lib/index.js'),
 		JSON.stringify(opts)
-	];
+	]);
 
-	var cp = spawn(phantomjs, args);
 	var stream = cp.stdout.pipe(base64.decode());
 
 	process.stderr.setMaxListeners(0);
