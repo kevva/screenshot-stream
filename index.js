@@ -46,6 +46,10 @@ module.exports = function (url, size, opts) {
 			return;
 		}
 
+		if (/http:\/\/requirejs.org\/docs\/errors.html#mismatch/.test(data)) {
+			return;
+		}
+
 		if (/^WARN: /.test(data)) {
 			stream.emit('warn', data.replace(/^WARN: /, ''));
 			return;
