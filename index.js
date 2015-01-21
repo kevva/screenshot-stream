@@ -2,6 +2,7 @@
 var path = require('path');
 var base64 = require('base64-stream');
 var es5 = require.resolve('es5-shim');
+var fs = require('fs');
 var parseCookie = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
 
@@ -35,6 +36,7 @@ module.exports = function (url, size, opts) {
 	]);
 
 	var stream = cp.stdout.pipe(base64.decode());
+	var es5shim = fs.readFileSync(es5, 'utf8');
 
 	process.stderr.setMaxListeners(0);
 
@@ -47,6 +49,10 @@ module.exports = function (url, size, opts) {
 		}
 
 		if (/http:\/\/requirejs.org\/docs\/errors.html#mismatch/.test(data)) {
+			return;
+		}
+
+		if (es5shim.indexOf(data) !== -1) {
 			return;
 		}
 
