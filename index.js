@@ -1,4 +1,5 @@
 'use strict';
+var fs = require('fs');
 var path = require('path');
 var base64 = require('base64-stream');
 var es5 = require.resolve('es5-shim');
