@@ -1,4 +1,5 @@
 'use strict';
+
 var fs = require('fs');
 var path = require('path');
 var base64 = require('base64-stream');
@@ -6,15 +7,6 @@ var es5 = require.resolve('es5-shim');
 var fs = require('fs');
 var parseCookie = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
-
-/**
- * Screenshot stream
- *
- * @param {String} url
- * @param {String} size
- * @param {Object} opts
- * @api public
- */
 
 module.exports = function (url, size, opts) {
 	opts = opts || {};
