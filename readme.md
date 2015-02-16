@@ -115,7 +115,7 @@ Password for authenticating with HTTP auth.
 Type: `String`  
 Default: `png`
 
-Set format to render the image as. Supported formats are `png` and `jpeg`.
+Set format to render the image as. Supported formats are `png` and `jpg`.
 
 ### scale
 
