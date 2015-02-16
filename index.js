@@ -16,7 +16,7 @@ module.exports = function (url, size, opts) {
 	opts.scale = opts.scale > 1 ? opts.scale : 1;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
-	opts.format = opts.format || 'png';
+	opts.format = opts.format === 'jpg' ? 'jpeg' : opts.format ? opts.format : 'png';
 	opts.cookies = (opts.cookies || []).map(function (cookie) {
 		return typeof cookie === 'string' ? parseCookie(cookie) : cookie;
 	});

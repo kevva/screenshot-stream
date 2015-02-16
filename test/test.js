@@ -122,7 +122,7 @@ test('have a `format` option', function (t) {
 	t.plan(1);
 
 	var stream = screenshot('http://yeoman.io', '1024x768', {
-		format: 'jpeg'
+		format: 'jpg'
 	});
 
 	stream.pipe(concat(function (data) {
