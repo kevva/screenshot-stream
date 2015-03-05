@@ -4,7 +4,6 @@ var fs = require('fs');
 var path = require('path');
 var base64 = require('base64-stream');
 var es5 = require.resolve('es5-shim');
-var fs = require('fs');
 var parseCookie = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
 
