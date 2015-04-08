@@ -5,7 +5,7 @@
 
 ## Install
 
-```sh
+```
 $ npm install --save screenshot-stream
 ```
 
@@ -28,31 +28,31 @@ stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
 
 #### url
 
-Type: `String`
+Type: `string`
 
 Add page to capture.
 
 #### size
 
-Type: `String`
+Type: `string`
 
 Set viewport size.
 
 #### options
 
-Type: `Object`
+Type: `object`
 
 Define [options](#options) to be used.
 
 #### .on('error', callback)
 
-Type: `Function`
+Type: `function`
 
 PhantomJS errors.
 
 #### .on('warn', callback)
 
-Type: `Function`
+Type: `function`
 
 Warnings with eg. page errors.
 
@@ -61,21 +61,21 @@ Warnings with eg. page errors.
 
 ### crop
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Crop to the set height.
 
 ### delay
 
-Type: `Number` *(seconds)*  
+Type: `number` *(seconds)*  
 Default: `0`
 
 Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
 
 ### selector
 
-Type: `String`
+Type: `string`
 
 Capture a specific DOM element.
 
@@ -87,46 +87,46 @@ Hide an array of DOM elements.
 
 ### customHeaders
 
-Type: `Object`  
+Type: `object`  
 Default: `{}`
 
 Set custom headers.
 
 ### cookies
 
-Type: `Array|Object`
+Type: `array` or `object`
 
 A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
 
 ### username
 
-Type: `String`
+Type: `string`
 
 Username for authenticating with HTTP auth.
 
 ### password
 
-Type: `String`
+Type: `string`
 
 Password for authenticating with HTTP auth.
 
 ### format
 
-Type: `String`  
+Type: `string`  
 Default: `png`
 
 Set format to render the image as. Supported formats are `png` and `jpg`.
 
 ### scale
 
-Type: `Number`  
+Type: `number`  
 Default: `1`
 
 Scale webpage `n` times.
 
 ### userAgent
 
-Type: `String`
+Type: `string`
 
 Set a custom user agent.
 
