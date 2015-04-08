@@ -124,6 +124,12 @@ Default: `1`
 
 Scale webpage `n` times.
 
+### userAgent
+
+Type: `String`
+
+Set a custom user agent.
+
 
 ## CLI
 
