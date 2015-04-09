@@ -81,7 +81,7 @@ Capture a specific DOM element.
 
 ### hide
 
-Type: `Array`
+Type: `array`
 
 Hide an array of DOM elements.
 

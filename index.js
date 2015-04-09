@@ -2,22 +2,22 @@
 
 var fs = require('fs');
 var path = require('path');
-var base64 = require('base64-stream');
-var es5 = require.resolve('es5-shim');
-var parseCookie = require('parse-cookie-phantomjs');
+var base64Stream = require('base64-stream');
+var es5Shim = require.resolve('es5-shim');
+var parseCookiePhantomjs = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
 
 module.exports = function (url, size, opts) {
 	opts = opts || {};
 	opts.url = url;
-	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5);
+	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5Shim);
 	opts.delay = opts.delay || 0;
 	opts.scale = opts.scale > 1 ? opts.scale : 1;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
 	opts.format = opts.format === 'jpg' ? 'jpeg' : opts.format ? opts.format : 'png';
 	opts.cookies = (opts.cookies || []).map(function (cookie) {
-		return typeof cookie === 'string' ? parseCookie(cookie) : cookie;
+		return typeof cookie === 'string' ? parseCookiePhantomjs(cookie) : cookie;
 	});
 
 	var cp = phantomBridge(path.join(__dirname, 'lib/index.js'), [
@@ -27,8 +27,8 @@ module.exports = function (url, size, opts) {
 		JSON.stringify(opts)
 	]);
 
-	var stream = cp.stdout.pipe(base64.decode());
-	var es5shim = fs.readFileSync(es5, 'utf8');
+	var stream = cp.stdout.pipe(base64Stream.decode());
+	var es5shim = fs.readFileSync(es5Shim, 'utf8');
 
 	process.stderr.setMaxListeners(0);
 
