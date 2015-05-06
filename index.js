@@ -12,7 +12,7 @@ module.exports = function (url, size, opts) {
 	opts.url = url;
 	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5Shim);
 	opts.delay = opts.delay || 0;
-	opts.scale = opts.scale > 1 ? opts.scale : 1;
+	opts.scale = opts.scale || 1;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
 	opts.format = opts.format === 'jpg' ? 'jpeg' : opts.format ? opts.format : 'png';
