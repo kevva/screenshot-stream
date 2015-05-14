@@ -42,7 +42,78 @@ Set viewport size.
 
 Type: `object`
 
-Define [options](#options) to be used.
+Define options to be used.
+
+##### crop
+
+Type: `boolean`  
+Default: `false`
+
+Crop to the set height.
+
+##### delay
+
+Type: `number` *(seconds)*  
+Default: `0`
+
+Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
+
+##### selector
+
+Type: `string`
+
+Capture a specific DOM element.
+
+##### hide
+
+Type: `array`
+
+Hide an array of DOM elements.
+
+##### customHeaders
+
+Type: `object`  
+Default: `{}`
+
+Set custom headers.
+
+##### cookies
+
+Type: `array` or `object`
+
+A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
+
+##### username
+
+Type: `string`
+
+Username for authenticating with HTTP auth.
+
+##### password
+
+Type: `string`
+
+Password for authenticating with HTTP auth.
+
+##### format
+
+Type: `string`  
+Default: `png`
+
+Set format to render the image as. Supported formats are `png` and `jpg`.
+
+##### scale
+
+Type: `number`  
+Default: `1`
+
+Scale webpage `n` times.
+
+##### userAgent
+
+Type: `string`
+
+Set a custom user agent.
 
 #### .on('error', callback)
 
@@ -55,80 +126,6 @@ PhantomJS errors.
 Type: `function`
 
 Warnings with eg. page errors.
-
-
-## Options
-
-### crop
-
-Type: `boolean`  
-Default: `false`
-
-Crop to the set height.
-
-### delay
-
-Type: `number` *(seconds)*  
-Default: `0`
-
-Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
-
-### selector
-
-Type: `string`
-
-Capture a specific DOM element.
-
-### hide
-
-Type: `array`
-
-Hide an array of DOM elements.
-
-### customHeaders
-
-Type: `object`  
-Default: `{}`
-
-Set custom headers.
-
-### cookies
-
-Type: `array` or `object`
-
-A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
-
-### username
-
-Type: `string`
-
-Username for authenticating with HTTP auth.
-
-### password
-
-Type: `string`
-
-Password for authenticating with HTTP auth.
-
-### format
-
-Type: `string`  
-Default: `png`
-
-Set format to render the image as. Supported formats are `png` and `jpg`.
-
-### scale
-
-Type: `number`  
-Default: `1`
-
-Scale webpage `n` times.
-
-### userAgent
-
-Type: `string`
-
-Set a custom user agent.
 
 
 ## CLI
