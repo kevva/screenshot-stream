@@ -21,8 +21,8 @@ module.exports = function (url, size, opts) {
 	});
 
 	if (!opts.disableShim){
-		opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5Shim);
-		es5shim = fs.readFileSync(es5Shim, 'utf8');
+	  opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5Shim);
+	  es5shim = fs.readFileSync(es5Shim, 'utf8');
 	}
 
 	var cp = phantomBridge(path.join(__dirname, 'lib/index.js'), [
