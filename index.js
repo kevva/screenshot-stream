@@ -11,6 +11,7 @@ var es5shim;
 module.exports = function (url, size, opts) {
 	opts = opts || {};
 	opts.url = url;
+	opts.es5shim = opts.es5shim !== false ? path.relative(path.join(__dirname, 'lib'), es5Shim) : null;
 	opts.delay = opts.delay || 0;
 	opts.scale = opts.scale || 1;
 	opts.width = size.split(/x/i)[0] * opts.scale;
@@ -20,8 +21,7 @@ module.exports = function (url, size, opts) {
 		return typeof cookie === 'string' ? parseCookiePhantomjs(cookie) : cookie;
 	});
 
-	if (!opts.disableShim){
-	  opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5Shim);
+	if (opts.es5shim){
 	  es5shim = fs.readFileSync(es5Shim, 'utf8');
 	}
 
