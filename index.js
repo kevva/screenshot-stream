@@ -6,11 +6,12 @@ var base64Stream = require('base64-stream');
 var es5Shim = require.resolve('es5-shim');
 var parseCookiePhantomjs = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
+var es5shim;
 
 module.exports = function (url, size, opts) {
 	opts = opts || {};
 	opts.url = url;
-	opts.es5shim = path.relative(path.join(__dirname, 'lib'), es5Shim);
+	opts.es5shim = opts.es5shim !== false ? path.relative(path.join(__dirname, 'lib'), es5Shim) : null;
 	opts.delay = opts.delay || 0;
 	opts.scale = opts.scale || 1;
 	opts.width = size.split(/x/i)[0] * opts.scale;
@@ -20,6 +21,10 @@ module.exports = function (url, size, opts) {
 		return typeof cookie === 'string' ? parseCookiePhantomjs(cookie) : cookie;
 	});
 
+	if (opts.es5shim) {
+		es5shim = fs.readFileSync(es5Shim, 'utf8');
+	}
+
 	var cp = phantomBridge(path.join(__dirname, 'lib/index.js'), [
 		'--ignore-ssl-errors=true',
 		'--local-to-remote-url-access=true',
@@ -28,7 +33,6 @@ module.exports = function (url, size, opts) {
 	]);
 
 	var stream = cp.stdout.pipe(base64Stream.decode());
-	var es5shim = fs.readFileSync(es5Shim, 'utf8');
 
 	process.stderr.setMaxListeners(0);
 
@@ -44,7 +48,7 @@ module.exports = function (url, size, opts) {
 			return;
 		}
 
-		if (es5shim.indexOf(data) !== -1) {
+		if (es5shim && es5shim.indexOf(data) !== -1) {
 			return;
 		}
 
