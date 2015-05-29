@@ -21,7 +21,7 @@ module.exports = function (url, size, opts) {
 		return typeof cookie === 'string' ? parseCookiePhantomjs(cookie) : cookie;
 	});
 
-	if (opts.es5Shim) {
+	if (opts.es5shim) {
 		es5shim = fs.readFileSync(es5Shim, 'utf8');
 	}
 
