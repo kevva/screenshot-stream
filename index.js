@@ -1,18 +1,20 @@
 'use strict';
-
 var fs = require('fs');
 var path = require('path');
 var base64Stream = require('base64-stream');
 var es5Shim = require.resolve('es5-shim');
 var parseCookiePhantomjs = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
+var objectAssign = require('object-assign');
 var es5shim;
 
 module.exports = function (url, size, opts) {
-	opts = opts || {};
+	opts = objectAssign({
+		delay: 0,
+		scale: 1
+	}, opts);
+
 	opts.url = url;
-	opts.delay = opts.delay || 0;
-	opts.scale = opts.scale || 1;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
 	opts.es5shim = opts.es5shim !== false ? path.relative(path.join(__dirname, 'lib'), es5Shim) : null;
