@@ -27,7 +27,7 @@ module.exports = function (url, size, opts) {
 		es5shim = fs.readFileSync(es5Shim, 'utf8');
 	}
 
-	var cp = phantomBridge(path.join(__dirname, 'lib/index.js'), [
+	var cp = phantomBridge(path.join(__dirname, 'stream.js'), [
 		'--ignore-ssl-errors=true',
 		'--local-to-remote-url-access=true',
 		'--ssl-protocol=any',
