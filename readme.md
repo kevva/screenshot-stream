@@ -70,7 +70,7 @@ Type: `array`
 
 Hide an array of DOM elements.
 
-##### customHeaders
+##### headers
 
 Type: `object`  
 Default: `{}`

@@ -7,7 +7,8 @@ var isPng = require('is-png');
 var PNG = require('png-js');
 var test = require('ava');
 var screenshotStream = require('../');
-var server = require('./fixtures/test-cookies.js');
+var cookieServer = require('./fixtures/test-cookies.js');
+var headersServer = require('./fixtures/test-headers.js');
 
 test('generate screenshot', function (t) {
 	t.plan(1);
@@ -132,7 +133,7 @@ test('have a `format` option', function (t) {
 test('send cookie', function (t) {
 	t.plan(1);
 
-	var srv = server(9000);
+	var srv = cookieServer(9000);
 	var stream = screenshotStream('http://localhost:9000', '100x100', {
 		cookies: ['color=black; Path=/; Domain=localhost']
 	});
@@ -150,7 +151,7 @@ test('send cookie', function (t) {
 test('send cookie using an object', function (t) {
 	t.plan(1);
 
-	var srv = server(9001);
+	var srv = cookieServer(9001);
 	var stream = screenshotStream('http://localhost:9001', '100x100', {
 		cookies: [{
 			name: 'color',
@@ -167,4 +168,21 @@ test('send cookie using an object', function (t) {
 			t.assert(pixels[0] === 0);
 		});
 	}));
+});
+
+test('send headers', function (t) {
+	t.plan(1);
+
+	var srv = headersServer(9002);
+
+	screenshotStream('http://localhost:9002', '100x100', {
+		headers: {
+			foobar: 'unicorn'
+		}
+	});
+
+	srv.on('/', function (req) {
+		srv.close();
+		t.assert(req.headers.foobar === 'unicorn');
+	});
 });

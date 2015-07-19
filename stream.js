@@ -17,7 +17,7 @@ console.log = console.error = function () {
 };
 
 if (opts.username && opts.password) {
-	opts.customHeaders = objectAssign({}, opts.customHeaders, {
+	opts.headers = objectAssign({}, opts.headers, {
 		Authorization: 'Basic ' + btoa(opts.username + ':' + opts.password)
 	});
 }
@@ -60,7 +60,7 @@ page.viewportSize = {
 	height: opts.height
 };
 
-page.customHeaders = opts.customHeaders || {};
+page.customHeaders = opts.headers || {};
 page.zoomFactor = opts.scale;
 
 page.open(opts.url, function (status) {
