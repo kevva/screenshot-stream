@@ -171,11 +171,27 @@ test('send cookie using an object', function (t) {
 });
 
 test('send headers', function (t) {
-	t.plan(1);
+	t.plan(2);
 
 	var srv = headersServer(9002);
 
 	screenshotStream('http://localhost:9002', '100x100', {
+		headers: ['foobar: unicorn', 'unicorn: foobar']
+	});
+
+	srv.on('/', function (req) {
+		srv.close();
+		t.assert(req.headers.foobar === 'unicorn');
+		t.assert(req.headers.unicorn === 'foobar');
+	});
+});
+
+test('send headers using an object', function (t) {
+	t.plan(1);
+
+	var srv = headersServer(9003);
+
+	screenshotStream('http://localhost:9003', '100x100', {
 		headers: {
 			foobar: 'unicorn'
 		}
