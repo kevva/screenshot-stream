@@ -4,7 +4,6 @@ var path = require('path');
 var base64Stream = require('base64-stream');
 var es5Shim = require.resolve('es5-shim');
 var parseCookiePhantomjs = require('parse-cookie-phantomjs');
-var parseHeaders = require('parse-headers');
 var phantomBridge = require('phantom-bridge');
 var objectAssign = require('object-assign');
 var es5shim;
@@ -20,7 +19,6 @@ module.exports = function (url, size, opts) {
 	opts.height = size.split(/x/i)[1] * opts.scale;
 	opts.es5shim = opts.es5shim !== false ? path.relative(path.join(__dirname, 'lib'), es5Shim) : null;
 	opts.format = opts.format === 'jpg' ? 'jpeg' : opts.format ? opts.format : 'png';
-	opts.headers = Array.isArray(opts.headers) ? parseHeaders(opts.headers.join('\n')) : opts.headers;
 	opts.cookies = (opts.cookies || []).map(function (cookie) {
 		return typeof cookie === 'string' ? parseCookiePhantomjs(cookie) : cookie;
 	});
