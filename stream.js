@@ -28,7 +28,7 @@ if (opts.userAgent) {
 
 opts.cookies.forEach(function (cookie) {
 	if (!phantom.addCookie(cookie)) {
-		console.error('Couldn\'t add cookie: ' + cookie);
+		console.error('Couldn\'t add cookie: ' + JSON.stringify(cookie));
 		phantom.exit(1);
 	}
 });
