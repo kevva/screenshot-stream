@@ -13,7 +13,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "ava"
+    "test": "xo && ava"
   },
   "files": [
     "index.js",
@@ -45,6 +45,7 @@
     "image-size": "^0.3.3",
     "is-jpg": "^1.0.0",
     "is-png": "^1.0.0",
-    "png-js": "^0.1.1"
+    "png-js": "^0.1.1",
+    "xo": "*"
   }
 }

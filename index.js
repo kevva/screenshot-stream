@@ -37,8 +37,12 @@ module.exports = function (url, size, opts) {
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
 	opts.es5shim = opts.es5shim !== false ? path.relative(path.join(__dirname, 'lib'), es5Shim) : null;
-	opts.format = opts.format === 'jpg' ? 'jpeg' : opts.format ? opts.format : 'png';
+	opts.format = opts.format ? opts.format : 'png';
 	opts.cookies = handleCookies(opts.cookies, opts.url);
+
+	if (opts.format === 'jpg') {
+		opts.format = 'jpeg';
+	}
 
 	if (opts.es5shim) {
 		es5shim = fs.readFileSync(es5Shim, 'utf8');
