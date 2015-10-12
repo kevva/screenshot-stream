@@ -13,7 +13,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "node test/test.js"
+    "test": "ava"
   },
   "files": [
     "index.js",
@@ -39,7 +39,7 @@
     "phantom-bridge": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "0.0.4",
+    "ava": "*",
     "concat-stream": "^1.4.6",
     "cookie": "^0.1.2",
     "image-size": "^0.3.3",
