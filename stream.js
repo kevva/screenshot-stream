@@ -36,7 +36,7 @@ opts.cookies.forEach(function (cookie) {
 phantom.onError = function (err, trace) {
 	console.error([
 		'PHANTOM ERROR: ' + err,
-    trace[0]?formatTrace(trace[0]):trace
+		trace[0] ? formatTrace(trace[0]) : trace
 	].join('\n'));
 
 	phantom.exit(1);
@@ -45,7 +45,7 @@ phantom.onError = function (err, trace) {
 page.onError = function (err, trace) {
 	console.error([
 		'WARN: ' + err,
-    trace[0]?formatTrace(trace[0]):trace
+		trace[0] ? formatTrace(trace[0]) : trace
 	].join('\n'));
 };
 
@@ -89,18 +89,19 @@ page.open(opts.url, function (status) {
 		}
 	});
 
-  if (opts.script) {
-    page.injectJs(opts.script);
-  }
+	if (opts.script) {
+		page.injectJs(opts.script);
+	}
 
 	window.setTimeout(function () {
 		if (opts.hide) {
 			page.evaluate(function (els) {
-				els.forEach(function (el) {
+				var applyHideSelector = function (el) {
 					[].forEach.call(document.querySelectorAll(el), function (e) {
 						e.style.visibility = 'hidden';
 					});
-				});
+				};
+				els.forEach(applyHideSelector);
 			}, opts.hide);
 		}
 

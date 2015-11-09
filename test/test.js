@@ -169,15 +169,14 @@ test('send headers', t => {
 	});
 });
 
-
 test('inject a script', t => {
-  t.plan(1);
+	t.plan(1);
 
-  const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
+	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
 
-  screenshotStream(fixture, '100x100', {
-    script: path.join(__dirname, 'fixtures/test-phantomjs-script.js')
-  }).on('warn', function (d) {
-    t.ok((d+'').match(/tomate/))
-  });
+	screenshotStream(fixture, '100x100', {
+		script: path.join(__dirname, 'fixtures/test-phantomjs-script.js')
+	}).on('warn', function (d) {
+		t.ok(String(d).match(/tomate/));
+	});
 });
