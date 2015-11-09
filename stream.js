@@ -36,7 +36,7 @@ opts.cookies.forEach(function (cookie) {
 phantom.onError = function (err, trace) {
 	console.error([
 		'PHANTOM ERROR: ' + err,
-		formatTrace(trace[0])
+    trace[0]?formatTrace(trace[0]):trace
 	].join('\n'));
 
 	phantom.exit(1);
@@ -45,7 +45,7 @@ phantom.onError = function (err, trace) {
 page.onError = function (err, trace) {
 	console.error([
 		'WARN: ' + err,
-		formatTrace(trace[0])
+    trace[0]?formatTrace(trace[0]):trace
 	].join('\n'));
 };
 
@@ -88,6 +88,10 @@ page.open(opts.url, function (status) {
 			document.body.style.backgroundColor = 'white';
 		}
 	});
+
+  if (opts.script) {
+    page.injectJs(opts.script);
+  }
 
 	window.setTimeout(function () {
 		if (opts.hide) {
