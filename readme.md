@@ -161,7 +161,7 @@ __demo user script__
 console.log('wait for 2.5 s')
 setTimeout(function () {
   console.log('then sends out message to indicate its all done')
-  console.log(window.pageResToken) // this line indicate the end of the script.
+  console.log(window.userScriptEndToken) // this line indicate the end of the script.
 }, 2500);
 ```
 
