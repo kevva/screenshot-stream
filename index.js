@@ -36,7 +36,7 @@ module.exports = function (url, size, opts) {
 	opts.url = url;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
-	opts.es5shim = opts.es5shim !== false ? path.relative(path.join(__dirname, 'lib'), es5Shim) : null;
+	opts.es5shim = opts.es5shim === false ? null : path.relative(path.join(__dirname, 'lib'), es5Shim);
 	opts.format = opts.format ? opts.format : 'png';
 	opts.cookies = handleCookies(opts.cookies, opts.url);
 
@@ -77,6 +77,11 @@ module.exports = function (url, size, opts) {
 
 		if (/^WARN: /.test(data)) {
 			stream.emit('warn', data.replace(/^WARN: /, ''));
+			return;
+		}
+
+		if (/^TOKEN: /.test(data)) {
+			stream.emit('token', data.replace(/^TOKEN: /, ''));
 			return;
 		}
 

@@ -33,21 +33,40 @@ opts.cookies.forEach(function (cookie) {
 	}
 });
 
+// Tokens to indicate and detect the end of user script execution
+var userScriptDone = false;
+var userScriptEndToken = ('script' in opts) ? 'shoot-token-' + (new Date().getTime()) : '';
+
 phantom.onError = function (err, trace) {
+	// enforce end of user script to prevent dead process
+	userScriptDone = true;
 	console.error([
 		'PHANTOM ERROR: ' + err,
-		formatTrace(trace[0])
+		trace[0] ? formatTrace(trace[0]) : trace
 	].join('\n'));
 
 	phantom.exit(1);
 };
 
 page.onError = function (err, trace) {
+	// enforce end of user script to prevent dead process
+	userScriptDone = true;
 	console.error([
 		'WARN: ' + err,
-		formatTrace(trace[0])
+		trace[0] ? formatTrace(trace[0]) : trace
 	].join('\n'));
 };
+
+// watch for console.log message sent from page context
+// to catch the end of user script
+if ('script' in opts) {
+	page.onConsoleMessage = function (msg) {
+		if (userScriptEndToken === msg) {
+			userScriptDone = true;
+			console.error('TOKEN: ' + msg);
+		}
+	};
+}
 
 if (opts.es5shim) {
 	page.onResourceReceived = function () {
@@ -89,7 +108,7 @@ page.open(opts.url, function (status) {
 		}
 	});
 
-	window.setTimeout(function () {
+	var takeScreenShot = function () {
 		if (opts.hide) {
 			page.evaluate(function (els) {
 				els.forEach(function (el) {
@@ -110,5 +129,32 @@ page.open(opts.url, function (status) {
 
 		log.call(console, page.renderBase64(opts.format));
 		phantom.exit();
-	}, opts.delay * 1000);
+	};
+
+	// A timeout to prevent dead process ect
+	opts.timeout = opts.timeout || 30;
+	var executeScriptTimeout = setTimeout(function () {
+		userScriptDone = true;
+	}, opts.timeout * 1000);
+
+	// Inject the user script to automate the page.
+	// The script user will write the userScriptEndToken on console.log
+	// to indicate the end of its actions.
+	if ('script' in opts) {
+		// Register the userScriptEndToken token on window context
+		page.evaluate(function (token) {
+			window.userScriptEndToken = token;
+		}, userScriptEndToken);
+		// Update page render with help of the user script.
+		page.injectJs(opts.script);
+		// By now, wait for the end of user script to take the screenshot
+		setInterval(function () {
+			if (userScriptDone) {
+				clearTimeout(executeScriptTimeout);
+				setTimeout(takeScreenShot, opts.delay * 1000);
+			}
+		}, 20);
+	} else {
+		setTimeout(takeScreenShot, opts.delay * 1000);
+	}
 });

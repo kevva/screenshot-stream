@@ -115,6 +115,18 @@ Type: `string`
 
 Set a custom user agent.
 
+##### script
+
+Type: `string`
+
+Set a script to inject in the phantomJS process before the screenshot is taken.
+
+##### timeout
+
+Type: `string`
+
+Set a timeout to execute your script.
+
 #### .on('error', callback)
 
 Type: `function`
@@ -126,6 +138,32 @@ PhantomJS errors.
 Type: `function`
 
 Warnings with eg. page errors.
+
+#### .on('token', callback)
+
+Type: `function`
+
+The screenshot-stream token to output from your injected script when you are all done.
+
+
+## Script injection
+
+You can inject script into phantomJS process before the screenshot is made.
+
+This script is regular javascript run in the browser.
+
+To indicate that your script has finished his action and that the screenshot can be made,
+
+the script will have to output the `shoot-token` on `console.log`
+
+__demo user script__
+```js
+console.log('wait for 2.5 s')
+setTimeout(function () {
+  console.log('then sends out message to indicate its all done')
+  console.log(window.userScriptEndToken) // this line indicate the end of the script.
+}, 2500);
+```
 
 
 ## CLI
