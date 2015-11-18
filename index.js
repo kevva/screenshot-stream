@@ -80,6 +80,11 @@ module.exports = function (url, size, opts) {
 			return;
 		}
 
+		if (/^TOKEN: /.test(data)) {
+			stream.emit('token', data.replace(/^TOKEN: /, ''));
+			return;
+		}
+
 		if (data.length) {
 			var err = new Error(data);
 			err.noStack = true;

@@ -168,3 +168,27 @@ test('send headers', t => {
 		t.is(req.headers.foobar, 'unicorn');
 	});
 });
+
+test('inject a script', t => {
+	t.plan(1);
+
+	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
+
+	screenshotStream(fixture, '100x100', {
+	  	script: path.join(__dirname, 'fixtures/test-phantomjs-script.js')
+	}).on('token', function (d) {
+	  	t.ok(String(d).match(/^pageres-token-[0-9]+$/));
+	});
+});
+
+test('inject a buggy script', t => {
+	t.plan(1);
+
+	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
+
+	screenshotStream(fixture, '100x100', {
+	  	script: path.join(__dirname, 'fixtures/test-phantomjs-buggy-script.js')
+	}).on('warn', function (d) {
+	  	t.ok(String(d).match(/tomate/));
+	});
+});
