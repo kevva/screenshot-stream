@@ -13,10 +13,10 @@ $ npm install --save screenshot-stream
 ## Usage
 
 ```js
-var fs = require('fs');
-var screenshot = require('screenshot-stream');
+const fs = require('fs');
+const screenshot = require('screenshot-stream');
 
-var stream = screenshot('http://google.com', '1024x768', {crop: true});
+const stream = screenshot('http://google.com', '1024x768', {crop: true});
 
 stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
 ```
@@ -24,7 +24,7 @@ stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
 
 ## API
 
-### screenshot(url, size, options)
+### screenshot(url, size, [options])
 
 #### url
 
@@ -125,7 +125,7 @@ PhantomJS errors.
 
 Type: `function`
 
-Warnings with eg. page errors.
+Warnings with for example page errors.
 
 
 ## CLI

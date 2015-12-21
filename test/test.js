@@ -1,141 +1,105 @@
 import path from 'path';
-import concatStream from 'concat-stream';
+import test from 'ava';
 import imageSize from 'image-size';
 import isJpg from 'is-jpg';
 import isPng from 'is-png';
 import PNG from 'png-js';
-import test from 'ava';
+import getStream from 'get-stream';
 import screenshotStream from '../';
 import cookieServer from './fixtures/test-cookies.js';
 import headersServer from './fixtures/test-headers.js';
 
-test('generate screenshot', t => {
-	t.plan(1);
-
+test('generate screenshot', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768');
-
-	stream.pipe(concatStream(data => t.true(isPng(data))));
+	t.true(isPng(await getStream.buffer(stream)));
 });
 
-test('crop image using the `crop` option', t => {
-	t.plan(2);
-
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {
-		crop: true
-	});
-
-	stream.pipe(concatStream(data => {
-		t.is(imageSize(data).width, 1024);
-		t.is(imageSize(data).height, 768);
-	}));
+test('crop image using the `crop` option', async t => {
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {crop: true});
+	const size = imageSize(await getStream.buffer(stream));
+	t.is(size.width, 1024);
+	t.is(size.height, 768);
 });
 
-test('capture a DOM element using the `selector` option', t => {
-	t.plan(2);
-
+test('capture a DOM element using the `selector` option', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {
 		selector: '.page-header'
 	});
 
-	stream.pipe(concatStream(data => {
-		t.is(imageSize(data).width, 1024);
-		t.is(imageSize(data).height, 80);
-	}));
+	const size = imageSize(await getStream.buffer(stream));
+	t.is(size.width, 1024);
+	t.is(size.height, 80);
 });
 
-test('capture a DOM element using the `selector` option only after delay', t => {
-	t.plan(2);
-
+test('capture a DOM element using the `selector` option only after delay', async t => {
 	const fixture = path.join(__dirname, 'fixtures', 'test-delay-element.html');
 	const stream = screenshotStream(fixture, '1024x768', {
 		selector: 'div',
 		delay: 5
 	});
 
-	stream.pipe(concatStream(data => {
-		t.is(imageSize(data).width, 300);
-		t.is(imageSize(data).height, 200);
-	}));
+	const size = imageSize(await getStream.buffer(stream));
+	t.is(size.width, 300);
+	t.is(size.height, 200);
 });
 
-test('hide elements using the `hide` option', t => {
-	t.plan(1);
-
+test('hide elements using the `hide` option', async t => {
 	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
-	const stream = screenshotStream(fixture, '100x100', {
-		hide: ['div']
-	});
-
-	stream.pipe(concatStream(data => {
-		const png = new PNG(data);
-		png.decode(pixels => t.is(pixels[0], 255));
-	}));
+	const stream = screenshotStream(fixture, '100x100', {hide: ['div']});
+	const png = new PNG(await getStream.buffer(stream));
+	png.decode(pixels => t.is(pixels[0], 255));
 });
 
-test('auth using the `username` and `password` options', t => {
-	t.plan(1);
-
+test.cb('auth using the `username` and `password` options', t => {
 	const stream = screenshotStream('http://httpbin.org/basic-auth/user/passwd', '1024x768', {
 		username: 'user',
 		password: 'passwd'
 	});
 
-	stream.on('data', data => t.ok(data.length));
-});
-
-test('have a `delay` option', t => {
-	t.plan(1);
-
-	const now = new Date();
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {
-		delay: 2
+	stream.once('data', data => {
+		t.ok(data.length);
+		t.end();
 	});
-
-	stream.once('data', () => t.true((new Date()) - now > 2000));
 });
 
-test('have a `dpi` option', t => {
-	t.plan(2);
+test.cb('have a `delay` option', t => {
+	const now = new Date();
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {delay: 2});
 
+	stream.once('data', () => {
+		t.true((new Date()) - now > 2000);
+		t.end();
+	});
+});
+
+test('have a `dpi` option', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {
 		crop: true,
 		scale: 2
 	});
 
-	stream.pipe(concatStream(data => {
-		t.is(imageSize(data).width, 1024 * 2);
-		t.is(imageSize(data).height, 768 * 2);
-	}));
+	const size = imageSize(await getStream.buffer(stream));
+	t.is(size.width, 1024 * 2);
+	t.is(size.height, 768 * 2);
 });
 
-test('have a `format` option', t => {
-	t.plan(1);
-
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {
-		format: 'jpg'
-	});
-
-	stream.pipe(concatStream(data => t.true(isJpg(data))));
+test('have a `format` option', async t => {
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {format: 'jpg'});
+	t.true(isJpg(await getStream.buffer(stream)));
 });
 
-test('send cookie', t => {
-	t.plan(1);
-
+test('send cookie', async t => {
 	const srv = cookieServer(9000);
 	const stream = screenshotStream('http://localhost:9000', '100x100', {
 		cookies: ['color=black; Path=/; Domain=localhost']
 	});
 
-	stream.pipe(concatStream(data => {
-		srv.close();
-		const png = new PNG(data);
-		png.decode(pixels => t.is(pixels[0], 0));
-	}));
+	const png = new PNG(await getStream.buffer(stream));
+	srv.close();
+	png.decode(pixels => t.is(pixels[0], 0));
 });
 
-test('send cookie using an object', t => {
-	t.plan(1);
-
+test('send cookie using an object', async t => {
 	const srv = cookieServer(9001);
 	const stream = screenshotStream('http://localhost:9001', '100x100', {
 		cookies: [{
@@ -145,16 +109,12 @@ test('send cookie using an object', t => {
 		}]
 	});
 
-	stream.pipe(concatStream(data => {
-		srv.close();
-		const png = new PNG(data);
-		png.decode(pixels => t.is(pixels[0], 0));
-	}));
+	const png = new PNG(await getStream.buffer(stream));
+	srv.close();
+	png.decode(pixels => t.is(pixels[0], 0));
 });
 
-test('send headers', t => {
-	t.plan(1);
-
+test.cb('send headers', t => {
 	const srv = headersServer(9002);
 
 	screenshotStream('http://localhost:9002', '100x100', {
@@ -166,5 +126,6 @@ test('send headers', t => {
 	srv.on('/', req => {
 		srv.close();
 		t.is(req.headers.foobar, 'unicorn');
+		t.end();
 	});
 });

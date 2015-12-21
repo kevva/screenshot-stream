@@ -7,7 +7,7 @@
   "author": {
     "email": "kevinmartensson@gmail.com",
     "name": "Kevin Mårtensson",
-    "url": "https://github.com/kevva"
+    "url": "github.com/kevva"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -34,14 +34,14 @@
   "dependencies": {
     "base64-stream": "^0.1.2",
     "es5-shim": "^4.0.3",
-    "object-assign": "^2.1.1",
+    "object-assign": "^4.0.1",
     "parse-cookie-phantomjs": "^1.0.0",
     "phantom-bridge": "^1.0.0"
   },
   "devDependencies": {
     "ava": "*",
-    "concat-stream": "^1.4.6",
-    "cookie": "^0.1.2",
+    "cookie": "^0.2.3",
+    "get-stream": "^1.1.0",
     "image-size": "^0.3.3",
     "is-jpg": "^1.0.0",
     "is-png": "^1.0.0",
