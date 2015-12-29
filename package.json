@@ -33,6 +33,7 @@
   ],
   "dependencies": {
     "base64-stream": "^0.1.2",
+    "byline": "^4.2.1",
     "es5-shim": "^4.0.3",
     "object-assign": "^4.0.1",
     "parse-cookie-phantomjs": "^1.0.0",
