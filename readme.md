@@ -1,4 +1,4 @@
-# screenshot-stream [![Build Status](http://img.shields.io/travis/kevva/screenshot-stream.svg?style=flat)](https://travis-ci.org/kevva/screenshot-stream)
+# screenshot-stream [![Build Status](https://travis-ci.org/kevva/screenshot-stream.svg?branch=master)](https://travis-ci.org/kevva/screenshot-stream)
 
 > Capture screenshot of a website and return it as a stream
 
