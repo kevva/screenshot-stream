@@ -1,4 +1,4 @@
-/* global phantom,document,window,btoa */
+/* global phantom, document, window, btoa */
 'use strict';
 var system = require('system');
 var page = require('webpage').create();
@@ -9,7 +9,7 @@ var log = console.log;
 function formatTrace(trace) {
 	var src = trace.file || trace.sourceURL;
 	var fn = (trace.function ? ' in function ' + trace.function : '');
-	return '→ ' + src + ' on line ' + trace.line + fn;
+	return ' → ' + src + ' on line ' + trace.line + fn;
 }
 
 console.log = console.error = function () {
@@ -34,19 +34,12 @@ opts.cookies.forEach(function (cookie) {
 });
 
 phantom.onError = function (err, trace) {
-	console.error([
-		'PHANTOM ERROR: ' + err,
-		formatTrace(trace[0])
-	].join('\n'));
-
+	console.error('PHANTOM ERROR: ' + err + formatTrace(trace[0]));
 	phantom.exit(1);
 };
 
 page.onError = function (err, trace) {
-	console.error([
-		'WARN: ' + err,
-		formatTrace(trace[0])
-	].join('\n'));
+	console.error('WARN: ' + err + formatTrace(trace[0]));
 };
 
 if (opts.es5shim) {
