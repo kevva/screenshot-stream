@@ -37,7 +37,7 @@ module.exports = function (url, size, opts) {
 	opts.url = url;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
-	opts.es5shim = opts.es5shim === false ? null : path.relative(path.join(__dirname, 'lib'), es5Shim);
+	opts.es5shim = opts.es5shim === false ? null : path.relative(__dirname, es5Shim);
 	opts.format = opts.format ? opts.format : 'png';
 	opts.cookies = handleCookies(opts.cookies, opts.url);
 
