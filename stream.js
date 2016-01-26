@@ -26,12 +26,7 @@ if (opts.userAgent) {
 	page.settings.userAgent = opts.userAgent;
 }
 
-opts.cookies.forEach(function (cookie) {
-	if (!phantom.addCookie(cookie)) {
-		console.error('Couldn\'t add cookie: ' + JSON.stringify(cookie));
-		phantom.exit(1);
-	}
-});
+phantom.cookies = opts.cookies;
 
 phantom.onError = function (err, trace) {
 	console.error('PHANTOM ERROR: ' + err + formatTrace(trace[0]));
