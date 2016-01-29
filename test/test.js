@@ -5,6 +5,7 @@ import isJpg from 'is-jpg';
 import isPng from 'is-png';
 import PNG from 'png-js';
 import getStream from 'get-stream';
+import rfpify from 'rfpify';
 import screenshotStream from '../';
 import cookieServer from './fixtures/test-cookies.js';
 import headersServer from './fixtures/test-headers.js';
@@ -86,6 +87,24 @@ test('have a `dpi` option', async t => {
 test('have a `format` option', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {format: 'jpg'});
 	t.true(isJpg(await getStream.buffer(stream)));
+});
+
+test('have a `css` option', async t => {
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {css: '.mobile-bar { background-color: red !important; }'});
+	const png = new PNG(await getStream.buffer(stream));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test('have a `css` file', async t => {
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {css: 'fixtures/style.css'});
+	const png = new PNG(await getStream.buffer(stream));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	t.is(pixels[0], 0);
+	t.is(pixels[1], 128);
+	t.is(pixels[2], 0);
 });
 
 test('send cookie', async t => {

@@ -67,7 +67,7 @@ page.open(opts.url, function (status) {
 		};
 	}
 
-	page.evaluate(function () {
+	page.evaluate(function (css) {
 		var bgColor = window
 			.getComputedStyle(document.body)
 			.getPropertyValue('background-color');
@@ -75,7 +75,13 @@ page.open(opts.url, function (status) {
 		if (!bgColor || bgColor === 'rgba(0, 0, 0, 0)') {
 			document.body.style.backgroundColor = 'white';
 		}
-	});
+
+		if (css) {
+			var el = document.createElement('style');
+			el.appendChild(document.createTextNode(css));
+			document.head.appendChild(el);
+		}
+	}, opts.css);
 
 	window.setTimeout(function () {
 		if (opts.hide) {
