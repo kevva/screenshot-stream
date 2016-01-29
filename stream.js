@@ -37,12 +37,6 @@ page.onError = function (err, trace) {
 	console.error('WARN: ' + err + formatTrace(trace[0]));
 };
 
-if (opts.es5shim) {
-	page.onResourceReceived = function () {
-		page.injectJs(opts.es5shim);
-	};
-}
-
 page.viewportSize = {
 	width: opts.width,
 	height: opts.height
