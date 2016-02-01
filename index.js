@@ -3,12 +3,10 @@ var fs = require('fs');
 var path = require('path');
 var urlMod = require('url');
 var base64Stream = require('base64-stream');
-var es5Shim = require.resolve('es5-shim');
 var parseCookiePhantomjs = require('parse-cookie-phantomjs');
 var phantomBridge = require('phantom-bridge');
 var objectAssign = require('object-assign');
 var byline = require('byline');
-var es5shim;
 
 function handleCookies(cookies, url) {
 	var parsedUrl = urlMod.parse(url);
@@ -37,16 +35,11 @@ module.exports = function (url, size, opts) {
 	opts.url = url;
 	opts.width = size.split(/x/i)[0] * opts.scale;
 	opts.height = size.split(/x/i)[1] * opts.scale;
-	opts.es5shim = opts.es5shim === false ? null : path.relative(__dirname, es5Shim);
 	opts.format = opts.format ? opts.format : 'png';
 	opts.cookies = handleCookies(opts.cookies, opts.url);
 
 	if (opts.format === 'jpg') {
 		opts.format = 'jpeg';
-	}
-
-	if (opts.es5shim) {
-		es5shim = fs.readFileSync(es5Shim, 'utf8');
 	}
 
 	if (/\.css$/.test(opts.css)) {
@@ -73,10 +66,6 @@ module.exports = function (url, size, opts) {
 		}
 
 		if (/http:\/\/requirejs.org\/docs\/errors.html#mismatch/.test(data)) {
-			return;
-		}
-
-		if (es5shim && es5shim.indexOf(data) !== -1) {
 			return;
 		}
 
