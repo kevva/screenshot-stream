@@ -1,4 +1,5 @@
 'use strict';
+var fs = require('fs');
 var path = require('path');
 var urlMod = require('url');
 var base64Stream = require('base64-stream');
@@ -39,6 +40,10 @@ module.exports = function (url, size, opts) {
 
 	if (opts.format === 'jpg') {
 		opts.format = 'jpeg';
+	}
+
+	if (/\.css$/.test(opts.css)) {
+		opts.css = fs.readFileSync(opts.css, 'utf8');
 	}
 
 	var cp = phantomBridge(path.join(__dirname, 'stream.js'), [

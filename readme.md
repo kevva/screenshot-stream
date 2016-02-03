@@ -64,6 +64,12 @@ Type: `string`
 
 Capture a specific DOM element.
 
+##### css
+
+Type: `string`
+
+Apply custom CSS to the webpage. Specify some CSS or the path to a CSS file.
+
 ##### hide
 
 Type: `array`
