@@ -37,6 +37,10 @@ page.onError = function (err, trace) {
 	console.error('WARN: ' + err + formatTrace(trace[0]));
 };
 
+page.onResourceError = function (resourceError) {
+	console.error('WARN: Unable to load resource #' + resourceError.id + ' (' + resourceError.errorString + ') → ' + resourceError.url);
+};
+
 page.viewportSize = {
 	width: opts.width,
 	height: opts.height
