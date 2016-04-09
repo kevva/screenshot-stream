@@ -63,7 +63,7 @@ Delay capturing the screenshot. Useful when the site does things after load that
 Type: `number` *(seconds)*  
 Default: `60`
 
-Number of seconds after which phantomjs aborts the request.
+Number of seconds after which PhantomJS aborts the request.
 
 ##### selector
 
