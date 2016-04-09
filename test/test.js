@@ -58,7 +58,7 @@ test.cb('auth using the `username` and `password` options', t => {
 	});
 
 	stream.once('data', data => {
-		t.ok(data.length);
+		t.truthy(data.length);
 		t.end();
 	});
 });
@@ -147,4 +147,15 @@ test.cb('send headers', t => {
 		t.is(req.headers.foobar, 'unicorn');
 		t.end();
 	});
+});
+
+test('resource timeout', t => {
+	const srv = headersServer(9003, {delay: 5});
+	srv.on('/', () => {
+		srv.close();
+		t.fail('Expected resourced timed out error');
+	});
+
+	const stream = screenshotStream('http://localhost:9003', '100x100', {timeout: 1});
+	t.throws(getStream(stream), 'Resource timed out #1 (Network timeout on resource.) → http://localhost:9003/');
 });
