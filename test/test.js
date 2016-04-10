@@ -9,6 +9,7 @@ import rfpify from 'rfpify';
 import screenshotStream from '../';
 import cookieServer from './fixtures/test-cookies.js';
 import headersServer from './fixtures/test-headers.js';
+import redirectsServer from './fixtures/test-redirects.js';
 
 test('generate screenshot', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768');
@@ -147,4 +148,12 @@ test.cb('send headers', t => {
 		t.is(req.headers.foobar, 'unicorn');
 		t.end();
 	});
+});
+
+test('handle redirects', async t => {
+	const srv = redirectsServer(9003);
+	const stream = screenshotStream('http://localhost:9003/redirect', '100x100');
+	const png = new PNG(await getStream.buffer(stream));
+	srv.close();
+	png.decode(pixels => t.is(pixels[0], 0));
 });
