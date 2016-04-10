@@ -59,7 +59,7 @@ test.cb('auth using the `username` and `password` options', t => {
 	});
 
 	stream.once('data', data => {
-		t.ok(data.length);
+		t.truthy(data.length);
 		t.end();
 	});
 });
