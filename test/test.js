@@ -162,6 +162,10 @@ test('resource timeout', async t => {
 	const s = await server({delay: 5});
 	const stream = screenshotStream(s.url, '100x100', {timeout: 1});
 
-	await t.throws(getStream(stream), `Resource timed out #1 (Network timeout on resource.) → ${s.url}/`);
+	await Promise.race([
+		rfpify(s.once.bind(s), Promise)('/').then(() => t.fail('Expected resource timed out error')),
+		t.throws(getStream(stream), `Resource timed out #1 (Network timeout on resource.) → ${s.url}/`)
+	]);
+
 	await s.close();
 });
