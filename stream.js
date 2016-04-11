@@ -26,6 +26,8 @@ if (opts.userAgent) {
 	page.settings.userAgent = opts.userAgent;
 }
 
+page.settings.resourceTimeout = (opts.timeout || 60) * 1000;
+
 phantom.cookies = opts.cookies;
 
 phantom.onError = function (err, trace) {
@@ -39,6 +41,11 @@ page.onError = function (err, trace) {
 
 page.onResourceError = function (resourceError) {
 	console.error('WARN: Unable to load resource #' + resourceError.id + ' (' + resourceError.errorString + ') → ' + resourceError.url);
+};
+
+page.onResourceTimeout = function (resourceTimeout) {
+	console.error('Resource timed out #' + resourceTimeout.id + ' (' + resourceTimeout.errorString + ') → ' + resourceTimeout.url);
+	phantom.exit(1);
 };
 
 page.viewportSize = {

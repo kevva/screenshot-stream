@@ -157,3 +157,14 @@ test('handle redirects', async t => {
 	srv.close();
 	png.decode(pixels => t.is(pixels[0], 0));
 });
+
+test('resource timeout', t => {
+	const srv = headersServer(9004, {delay: 5});
+	srv.on('/', () => {
+		srv.close();
+		t.fail('Expected resourced timed out error');
+	});
+
+	const stream = screenshotStream('http://localhost:9003', '100x100', {timeout: 1});
+	t.throws(getStream(stream), 'Resource timed out #1 (Network timeout on resource.) → http://localhost:9003/');
+});
