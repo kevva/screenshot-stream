@@ -165,6 +165,6 @@ test('resource timeout', t => {
 		t.fail('Expected resourced timed out error');
 	});
 
-	const stream = screenshotStream('http://localhost:9003', '100x100', {timeout: 1});
-	t.throws(getStream(stream), 'Resource timed out #1 (Network timeout on resource.) → http://localhost:9003/');
+	const stream = screenshotStream('http://localhost:9004', '100x100', {timeout: 1});
+	t.throws(getStream(stream), 'Resource timed out #1 (Network timeout on resource.) → http://localhost:9004/');
 });
