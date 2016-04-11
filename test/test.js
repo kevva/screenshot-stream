@@ -7,9 +7,7 @@ import PNG from 'png-js';
 import getStream from 'get-stream';
 import rfpify from 'rfpify';
 import screenshotStream from '../';
-import cookieServer from './fixtures/test-cookies.js';
-import headersServer from './fixtures/test-headers.js';
-import redirectsServer from './fixtures/test-redirects.js';
+import server from './fixtures/server';
 
 test('generate screenshot', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768');
@@ -109,19 +107,21 @@ test('have a `css` file', async t => {
 });
 
 test('send cookie', async t => {
-	const srv = cookieServer(9000);
-	const stream = screenshotStream('http://localhost:9000', '100x100', {
+	const s = await server();
+	const stream = screenshotStream(`${s.url}/cookies`, '100x100', {
 		cookies: ['color=black; Path=/; Domain=localhost']
 	});
 
 	const png = new PNG(await getStream.buffer(stream));
-	srv.close();
-	png.decode(pixels => t.is(pixels[0], 0));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+
+	t.is(pixels[0], 0);
+	await s.close();
 });
 
 test('send cookie using an object', async t => {
-	const srv = cookieServer(9001);
-	const stream = screenshotStream('http://localhost:9001', '100x100', {
+	const s = await server();
+	const stream = screenshotStream(`${s.url}/cookies`, '100x100', {
 		cookies: [{
 			name: 'color',
 			value: 'black',
@@ -130,41 +130,38 @@ test('send cookie using an object', async t => {
 	});
 
 	const png = new PNG(await getStream.buffer(stream));
-	srv.close();
-	png.decode(pixels => t.is(pixels[0], 0));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+
+	t.is(pixels[0], 0);
+	await s.close();
 });
 
-test.cb('send headers', t => {
-	const srv = headersServer(9002);
+test('send headers', async t => {
+	const s = await server();
 
-	screenshotStream('http://localhost:9002', '100x100', {
+	screenshotStream(`${s.url}`, '100x100', {
 		headers: {
 			foobar: 'unicorn'
 		}
 	});
 
-	srv.on('/', req => {
-		srv.close();
-		t.is(req.headers.foobar, 'unicorn');
-		t.end();
-	});
+	t.is((await rfpify(s.once.bind(s), Promise)('/')).headers.foobar, 'unicorn');
+	await s.close();
 });
 
 test('handle redirects', async t => {
-	const srv = redirectsServer(9003);
-	const stream = screenshotStream('http://localhost:9003/redirect', '100x100');
+	const s = await server();
+	const stream = screenshotStream(`${s.url}/redirect`, '100x100');
 	const png = new PNG(await getStream.buffer(stream));
-	srv.close();
-	png.decode(pixels => t.is(pixels[0], 0));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	t.is(pixels[0], 0);
+	await s.close();
 });
 
-test('resource timeout', t => {
-	const srv = headersServer(9004, {delay: 5});
-	srv.on('/', () => {
-		srv.close();
-		t.fail('Expected resourced timed out error');
-	});
+test('resource timeout', async t => {
+	const s = await server({delay: 5});
+	const stream = screenshotStream(s.url, '100x100', {timeout: 1});
 
-	const stream = screenshotStream('http://localhost:9004', '100x100', {timeout: 1});
-	t.throws(getStream(stream), 'Resource timed out #1 (Network timeout on resource.) → http://localhost:9004/');
+	await t.throws(getStream(stream), `Resource timed out #1 (Network timeout on resource.) → ${s.url}/`);
+	await s.close();
 });
