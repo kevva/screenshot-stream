@@ -159,7 +159,7 @@ test('handle redirects', async t => {
 });
 
 test('resource timeout', t => {
-	const srv = headersServer(9003, {delay: 5});
+	const srv = headersServer(9004, {delay: 5});
 	srv.on('/', () => {
 		srv.close();
 		t.fail('Expected resourced timed out error');
