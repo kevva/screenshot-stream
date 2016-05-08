@@ -106,10 +106,10 @@ page.open(opts.url, function (status) {
 					.getBoundingClientRect();
 			}, opts.selector);
 
-      clipRect.height = clipRect.height * page.zoomFactor;
-      clipRect.width = clipRect.width * page.zoomFactor;
+      			clipRect.height = clipRect.height * page.zoomFactor;
+      			clipRect.width = clipRect.width * page.zoomFactor;
 
-      page.clipRect = clipRect  
+      			page.clipRect = clipRect  
 		}
 
 		log.call(console, page.renderBase64(opts.format));
