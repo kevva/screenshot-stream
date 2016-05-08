@@ -102,11 +102,18 @@ page.open(opts.url, function (status) {
 		}
 
 		if (opts.selector) {
-			page.clipRect = page.evaluate(function (el) {
+			var clipRect = page.evaluate(function (el) {
 				return document
 					.querySelector(el)
 					.getBoundingClientRect();
 			}, opts.selector);
+
+			clipRect.height *= page.zoomFactor;
+			clipRect.width *= page.zoomFactor;
+			clipRect.top *= page.zoomFactor;
+			clipRect.left *= page.zoomFactor;
+
+			page.clipRect = clipRect;
 		}
 
 		log.call(console, page.renderBase64(opts.format));
