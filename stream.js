@@ -31,11 +31,13 @@ page.settings.resourceTimeout = (opts.timeout || 60) * 1000;
 phantom.cookies = opts.cookies;
 
 phantom.onError = function (err, trace) {
+	err = err.replace(/\n/g, '');
 	console.error('PHANTOM ERROR: ' + err + formatTrace(trace[0]));
 	phantom.exit(1);
 };
 
 page.onError = function (err, trace) {
+	err = err.replace(/\n/g, '');
 	console.error('WARN: ' + err + formatTrace(trace[0]));
 };
 

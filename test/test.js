@@ -50,6 +50,12 @@ test('hide elements using the `hide` option', async t => {
 	png.decode(pixels => t.is(pixels[0], 255));
 });
 
+test('ignore multiline page errors', async t => {
+	const fixture = path.join(__dirname, 'fixtures', 'test-error-script.html');
+	const stream = screenshotStream(fixture, '100x100');
+	t.true(isPng(await getStream.buffer(stream)));
+});
+
 test('auth using the `username` and `password` options', async t => {
 	const stream = screenshotStream('http://httpbin.org/basic-auth/user/passwd', '1024x768', {
 		username: 'user',
