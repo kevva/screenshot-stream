@@ -50,26 +50,22 @@ test('hide elements using the `hide` option', async t => {
 	png.decode(pixels => t.is(pixels[0], 255));
 });
 
-test.cb('auth using the `username` and `password` options', t => {
+test('auth using the `username` and `password` options', async t => {
 	const stream = screenshotStream('http://httpbin.org/basic-auth/user/passwd', '1024x768', {
 		username: 'user',
 		password: 'passwd'
 	});
 
-	stream.once('data', data => {
-		t.truthy(data.length);
-		t.end();
-	});
+	const data = await rfpify(stream.once.bind(stream))('data');
+	t.truthy(data.length);
 });
 
-test.cb('have a `delay` option', t => {
+test('have a `delay` option', async t => {
 	const now = new Date();
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {delay: 2});
+	await rfpify(stream.once.bind(stream))('data');
 
-	stream.once('data', () => {
-		t.true((new Date()) - now > 2000);
-		t.end();
-	});
+	t.true((new Date()) - now > 2000);
 });
 
 test('have a `dpi` option', async t => {
