@@ -3,6 +3,7 @@
 var system = require('system');
 var page = require('webpage').create();
 var objectAssign = require('object-assign');
+
 var opts = JSON.parse(system.args[1]);
 var log = console.log;
 
