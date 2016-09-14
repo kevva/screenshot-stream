@@ -40,27 +40,27 @@ Set viewport size.
 
 #### options
 
-Type: `object`
+Type: `Object`
 
 Define options to be used.
 
 ##### crop
 
-Type: `boolean`  
+Type: `Boolean`<br>
 Default: `false`
 
 Crop to the set height.
 
 ##### delay
 
-Type: `number` *(seconds)*  
+Type: `number` *(seconds)*<br>
 Default: `0`
 
 Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
 
 ##### timeout
 
-Type: `number` *(seconds)*  
+Type: `number` *(seconds)*<br>
 Default: `60`
 
 Number of seconds after which PhantomJS aborts the request.
@@ -79,20 +79,20 @@ Apply custom CSS to the webpage. Specify some CSS or the path to a CSS file.
 
 ##### hide
 
-Type: `array`
+Type: `Array`
 
 Hide an array of DOM elements.
 
 ##### headers
 
-Type: `object`  
+Type: `Object`<br>
 Default: `{}`
 
 Set custom headers.
 
 ##### cookies
 
-Type: `array` or `object`
+Type: `Array` or `Object`
 
 A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
 
@@ -110,14 +110,14 @@ Password for authenticating with HTTP auth.
 
 ##### format
 
-Type: `string`  
+Type: `string`<br>
 Default: `png`
 
 Set format to render the image as. Supported formats are `png` and `jpg`.
 
 ##### scale
 
-Type: `number`  
+Type: `number`<br>
 Default: `1`
 
 Scale webpage `n` times.
@@ -130,13 +130,13 @@ Set a custom user agent.
 
 #### .on('error', callback)
 
-Type: `function`
+Type: `Function`
 
 PhantomJS errors.
 
 #### .on('warn', callback)
 
-Type: `function`
+Type: `Function`
 
 Warnings with for example page errors.
 

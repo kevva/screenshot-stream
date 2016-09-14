@@ -6,8 +6,8 @@ import isPng from 'is-png';
 import PNG from 'png-js';
 import getStream from 'get-stream';
 import rfpify from 'rfpify';
-import screenshotStream from '../';
 import server from './fixtures/server';
+import screenshotStream from './';
 
 test('generate screenshot', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768');
