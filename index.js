@@ -67,6 +67,7 @@ module.exports = (url, size, opts) => {
 		}
 
 		if (/^WARN: /.test(data)) {
+			stream.emit('warning', data.replace(/^WARN: /, ''));
 			stream.emit('warn', data.replace(/^WARN: /, ''));
 			return;
 		}

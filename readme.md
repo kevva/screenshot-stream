@@ -134,7 +134,7 @@ Type: `Function`
 
 PhantomJS errors.
 
-#### .on('warn', callback)
+#### .on('warning', callback)
 
 Type: `Function`
 
