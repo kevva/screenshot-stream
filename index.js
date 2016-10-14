@@ -72,7 +72,7 @@ module.exports = (url, size, opts) => {
 			return;
 		}
 
-		if (data.length) {
+		if (data.length > 0) {
 			const err = new Error(data);
 			err.noStack = true;
 			cp.stdout.unpipe(stream);
