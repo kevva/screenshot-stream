@@ -81,7 +81,7 @@ Apply custom CSS to the webpage. Specify some CSS or the path to a CSS file.
 
 Type: `string`
 
-Apply custom JS to the webpage. Specify some JS or the path to a JS file.
+Apply custom JavaScript to the webpage. Specify some JavaScript or the path to a file.
 
 ##### hide
 
