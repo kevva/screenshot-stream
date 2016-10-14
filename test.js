@@ -108,6 +108,24 @@ test('have a `css` file', async t => {
 	t.is(pixels[2], 0);
 });
 
+test('have a `script` option', async t => {
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {script: 'document.querySelector(\'.mobile-bar\').style.backgroundColor = \'red\';'});
+	const png = new PNG(await getStream.buffer(stream));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test('have a `js` file', async t => {
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {script: 'fixtures/script.js'});
+	const png = new PNG(await getStream.buffer(stream));
+	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	t.is(pixels[0], 0);
+	t.is(pixels[1], 128);
+	t.is(pixels[2], 0);
+});
+
 test('send cookie', async t => {
 	const s = await server();
 	const stream = screenshotStream(`${s.url}/cookies`, '100x100', {

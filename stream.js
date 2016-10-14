@@ -117,6 +117,10 @@ page.open(opts.url, function (status) {
 			page.clipRect = clipRect;
 		}
 
+		if (opts.script) {
+			page.evaluateJavaScript('function () { ' + opts.script + '}');
+		}
+
 		log.call(console, page.renderBase64(opts.format));
 		phantom.exit();
 	}, opts.delay * 1000);
