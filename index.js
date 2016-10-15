@@ -38,7 +38,8 @@ module.exports = (url, size, opts) => {
 		height: size.split(/x/i)[1] * opts.scale,
 		cookies: handleCookies(opts.cookies, url),
 		format: opts.format === 'jpg' ? 'jpeg' : opts.format,
-		css: /\.css$/.test(opts.css) ? fs.readFileSync(opts.css, 'utf8') : opts.css
+		css: /\.css$/.test(opts.css) ? fs.readFileSync(opts.css, 'utf8') : opts.css,
+		script: /\.js$/.test(opts.script) ? fs.readFileSync(opts.script, 'utf8') : opts.script
 	});
 
 	const cp = phantomBridge(path.join(__dirname, 'stream.js'), [
