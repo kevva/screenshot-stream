@@ -1,6 +1,6 @@
 {
   "name": "screenshot-stream",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Capture screenshot of a website and return it as a stream",
   "license": "MIT",
   "repository": "kevva/screenshot-stream",
