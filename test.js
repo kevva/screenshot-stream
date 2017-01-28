@@ -189,3 +189,11 @@ test('resource timeout', async t => {
 
 	await s.close();
 });
+
+test('if phantomOpts contains [\'--version\'] no screenshot is taken', async t => {
+	// TODO: phantom-bridge's stream emits non base64 encoded version string
+	//       thus the decoded stream returned by `screenshotStream` is corrupted
+	//       which makes a straight forward test impossible
+	const stream = screenshotStream('http://yeoman.io', '1024x768', {}, ['--version']);
+	t.false(isPng(await getStream.buffer(stream)));
+});
