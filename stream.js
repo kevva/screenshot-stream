@@ -81,7 +81,7 @@ page.open(opts.url, function (status) {
 			.getPropertyValue('background-color');
 
 		if (!bgColor || bgColor === 'rgba(0, 0, 0, 0)') {
-			document.body.style.backgroundColor = 'white';
+			document.body.style.backgroundColor = opts.transparent ? 'transparent' : 'white';
 		}
 
 		if (css) {
