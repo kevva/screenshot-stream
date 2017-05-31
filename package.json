@@ -59,7 +59,8 @@
         "esnext": false,
         "rules": {
           "import/no-extraneous-dependencies": 0,
-          "import/no-unresolved": 0
+          "import/no-unresolved": 0,
+          "no-multi-assign": 0
         }
       }
     ]

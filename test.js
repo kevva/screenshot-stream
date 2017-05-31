@@ -47,7 +47,8 @@ test('hide elements using the `hide` option', async t => {
 	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
 	const stream = screenshotStream(fixture, '100x100', {hide: ['div']});
 	const png = new PNG(await getStream.buffer(stream));
-	png.decode(pixels => t.is(pixels[0], 255));
+	const pixels = await rfpify(png.decode.bind(png))();
+	t.is(pixels[0], 255);
 });
 
 test('ignore multiline page errors', async t => {
@@ -93,7 +94,7 @@ test('have a `format` option', async t => {
 test('have a `css` option', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {css: '.mobile-bar { background-color: red !important; }'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 	t.is(pixels[0], 255);
 	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
@@ -102,7 +103,7 @@ test('have a `css` option', async t => {
 test('have a `css` file', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {css: 'fixtures/style.css'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 	t.is(pixels[0], 0);
 	t.is(pixels[1], 128);
 	t.is(pixels[2], 0);
@@ -111,7 +112,7 @@ test('have a `css` file', async t => {
 test('have a `script` option', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {script: 'document.querySelector(\'.mobile-bar\').style.backgroundColor = \'red\';'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 	t.is(pixels[0], 255);
 	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
@@ -120,7 +121,7 @@ test('have a `script` option', async t => {
 test('have a `js` file', async t => {
 	const stream = screenshotStream('http://yeoman.io', '1024x768', {script: 'fixtures/script.js'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 	t.is(pixels[0], 0);
 	t.is(pixels[1], 128);
 	t.is(pixels[2], 0);
@@ -133,7 +134,7 @@ test('send cookie', async t => {
 	});
 
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 
 	t.is(pixels[0], 0);
 	await s.close();
@@ -150,7 +151,7 @@ test('send cookie using an object', async t => {
 	});
 
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 
 	t.is(pixels[0], 0);
 	await s.close();
@@ -165,7 +166,7 @@ test('send headers', async t => {
 		}
 	});
 
-	t.is((await rfpify(s.once.bind(s), Promise)('/')).headers.foobar, 'unicorn');
+	t.is((await rfpify(s.once.bind(s))('/')).headers.foobar, 'unicorn');
 	await s.close();
 });
 
@@ -173,7 +174,7 @@ test('handle redirects', async t => {
 	const s = await server();
 	const stream = screenshotStream(`${s.url}/redirect`, '100x100');
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png), Promise)();
+	const pixels = await rfpify(png.decode.bind(png))();
 	t.is(pixels[0], 0);
 	await s.close();
 });
@@ -183,7 +184,7 @@ test('resource timeout', async t => {
 	const stream = screenshotStream(s.url, '100x100', {timeout: 1});
 
 	await Promise.race([
-		rfpify(s.once.bind(s), Promise)('/').then(() => t.fail('Expected resource timed out error')),
+		rfpify(s.once.bind(s))('/').then(() => t.fail('Expected resource timed out error')),
 		t.throws(getStream(stream), `Resource timed out #1 (Network timeout on resource.) → ${s.url}/`)
 	]);
 

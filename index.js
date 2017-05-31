@@ -67,7 +67,7 @@ module.exports = (url, size, opts) => {
 			return;
 		}
 
-		if (/^WARN: /.test(data)) {
+		if (data.startsWith('WARN: ')) {
 			stream.emit('warning', data.replace(/^WARN: /, ''));
 			stream.emit('warn', data.replace(/^WARN: /, '')); // TODO: deprecate this event in v5
 			return;
