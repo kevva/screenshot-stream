@@ -24,7 +24,7 @@ stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
 
 ## API
 
-### screenshot(url, size, [options])
+### screenshot(url, size [, options] [, phantomOptions])
 
 #### url
 
@@ -133,6 +133,13 @@ Scale webpage `n` times.
 Type: `string`
 
 Set a custom user agent.
+
+#### phantomOptions
+
+Type: `Array`<br>
+Default: `['--ignore-ssl-errors=true', '--local-to-remote-url-access=true', '--ssl-protocol=any']`
+
+A list of [command-line options](http://phantomjs.org/api/command-line.html) passed to PhantomJS. Make sure to add default options to `phantomOptions`.
 
 #### .on('error', callback)
 

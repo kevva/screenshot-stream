@@ -25,12 +25,18 @@ const handleCookies = (cookies, url) => {
 	});
 };
 
-module.exports = (url, size, opts) => {
+module.exports = (url, size, opts, phantomOpts) => {
 	opts = Object.assign({
 		delay: 0,
 		scale: 1,
 		format: 'png'
 	}, opts);
+
+	phantomOpts = phantomOpts || [
+		'--ignore-ssl-errors=true',
+		'--local-to-remote-url-access=true',
+		'--ssl-protocol=any'
+	];
 
 	const args = Object.assign(opts, {
 		url,
@@ -42,12 +48,9 @@ module.exports = (url, size, opts) => {
 		script: /\.js$/.test(opts.script) ? fs.readFileSync(opts.script, 'utf8') : opts.script
 	});
 
-	const cp = phantomBridge(path.join(__dirname, 'stream.js'), [
-		'--ignore-ssl-errors=true',
-		'--local-to-remote-url-access=true',
-		'--ssl-protocol=any',
-		JSON.stringify(args)
-	]);
+	const cp = phantomBridge(path.join(__dirname, 'stream.js'),
+		phantomOpts.concat(JSON.stringify(args))
+	);
 
 	const stream = base64Stream.decode();
 
