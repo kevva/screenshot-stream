@@ -5,24 +5,24 @@ import isJpg from 'is-jpg';
 import isPng from 'is-png';
 import PNG from 'png-js';
 import getStream from 'get-stream';
-import rfpify from 'rfpify';
+import pify from 'pify';
 import server from './fixtures/server';
-import screenshotStream from './';
+import m from '.';
 
 test('generate screenshot', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768');
+	const stream = m('http://yeoman.io', '1024x768');
 	t.true(isPng(await getStream.buffer(stream)));
 });
 
 test('crop image using the `crop` option', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {crop: true});
+	const stream = m('http://yeoman.io', '1024x768', {crop: true});
 	const size = imageSize(await getStream.buffer(stream));
 	t.is(size.width, 1024);
 	t.is(size.height, 768);
 });
 
 test('capture a DOM element using the `selector` option', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {
+	const stream = m('http://yeoman.io', '1024x768', {
 		selector: '.page-header'
 	});
 
@@ -33,7 +33,7 @@ test('capture a DOM element using the `selector` option', async t => {
 
 test('capture a DOM element using the `selector` option only after delay', async t => {
 	const fixture = path.join(__dirname, 'fixtures', 'test-delay-element.html');
-	const stream = screenshotStream(fixture, '1024x768', {
+	const stream = m(fixture, '1024x768', {
 		selector: 'div',
 		delay: 5
 	});
@@ -45,38 +45,38 @@ test('capture a DOM element using the `selector` option only after delay', async
 
 test('hide elements using the `hide` option', async t => {
 	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
-	const stream = screenshotStream(fixture, '100x100', {hide: ['div']});
+	const stream = m(fixture, '100x100', {hide: ['div']});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 255);
 });
 
 test('ignore multiline page errors', async t => {
 	const fixture = path.join(__dirname, 'fixtures', 'test-error-script.html');
-	const stream = screenshotStream(fixture, '100x100');
+	const stream = m(fixture, '100x100');
 	t.true(isPng(await getStream.buffer(stream)));
 });
 
 test('auth using the `username` and `password` options', async t => {
-	const stream = screenshotStream('http://httpbin.org/basic-auth/user/passwd', '1024x768', {
+	const stream = m('http://httpbin.org/basic-auth/user/passwd', '1024x768', {
 		username: 'user',
 		password: 'passwd'
 	});
 
-	const data = await rfpify(stream.once.bind(stream))('data');
+	const data = await pify(stream.once.bind(stream), {errorFirst: false})('data');
 	t.truthy(data.length);
 });
 
 test('have a `delay` option', async t => {
 	const now = new Date();
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {delay: 2});
-	await rfpify(stream.once.bind(stream))('data');
+	const stream = m('http://yeoman.io', '1024x768', {delay: 2});
+	await pify(stream.once.bind(stream), {errorFirst: false})('data');
 
 	t.true((new Date()) - now > 2000);
 });
 
 test('have a `dpi` option', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {
+	const stream = m('http://yeoman.io', '1024x768', {
 		crop: true,
 		scale: 2
 	});
@@ -87,41 +87,41 @@ test('have a `dpi` option', async t => {
 });
 
 test('have a `format` option', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {format: 'jpg'});
+	const stream = m('http://yeoman.io', '1024x768', {format: 'jpg'});
 	t.true(isJpg(await getStream.buffer(stream)));
 });
 
 test('have a `css` option', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {css: '.mobile-bar { background-color: red !important; }'});
+	const stream = m('http://yeoman.io', '1024x768', {css: '.mobile-bar { background-color: red !important; }'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 255);
 	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
 });
 
 test('have a `css` file', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {css: 'fixtures/style.css'});
+	const stream = m('http://yeoman.io', '1024x768', {css: 'fixtures/style.css'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 0);
 	t.is(pixels[1], 128);
 	t.is(pixels[2], 0);
 });
 
 test('have a `script` option', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {script: 'document.querySelector(\'.mobile-bar\').style.backgroundColor = \'red\';'});
+	const stream = m('http://yeoman.io', '1024x768', {script: 'document.querySelector(\'.mobile-bar\').style.backgroundColor = \'red\';'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 255);
 	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
 });
 
 test('have a `js` file', async t => {
-	const stream = screenshotStream('http://yeoman.io', '1024x768', {script: 'fixtures/script.js'});
+	const stream = m('http://yeoman.io', '1024x768', {script: 'fixtures/script.js'});
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 0);
 	t.is(pixels[1], 128);
 	t.is(pixels[2], 0);
@@ -129,12 +129,12 @@ test('have a `js` file', async t => {
 
 test('send cookie', async t => {
 	const s = await server();
-	const stream = screenshotStream(`${s.url}/cookies`, '100x100', {
+	const stream = m(`${s.url}/cookies`, '100x100', {
 		cookies: ['color=black; Path=/; Domain=localhost']
 	});
 
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 
 	t.is(pixels[0], 0);
 	await s.close();
@@ -142,7 +142,7 @@ test('send cookie', async t => {
 
 test('send cookie using an object', async t => {
 	const s = await server();
-	const stream = screenshotStream(`${s.url}/cookies`, '100x100', {
+	const stream = m(`${s.url}/cookies`, '100x100', {
 		cookies: [{
 			name: 'color',
 			value: 'black',
@@ -151,7 +151,7 @@ test('send cookie using an object', async t => {
 	});
 
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 
 	t.is(pixels[0], 0);
 	await s.close();
@@ -160,31 +160,31 @@ test('send cookie using an object', async t => {
 test('send headers', async t => {
 	const s = await server();
 
-	screenshotStream(`${s.url}`, '100x100', {
+	m(`${s.url}`, '100x100', {
 		headers: {
 			foobar: 'unicorn'
 		}
 	});
 
-	t.is((await rfpify(s.once.bind(s))('/')).headers.foobar, 'unicorn');
+	t.is((await pify(s.once.bind(s), {errorFirst: false})('/')).headers.foobar, 'unicorn');
 	await s.close();
 });
 
 test('handle redirects', async t => {
 	const s = await server();
-	const stream = screenshotStream(`${s.url}/redirect`, '100x100');
+	const stream = m(`${s.url}/redirect`, '100x100');
 	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await rfpify(png.decode.bind(png))();
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 0);
 	await s.close();
 });
 
 test('resource timeout', async t => {
 	const s = await server({delay: 5});
-	const stream = screenshotStream(s.url, '100x100', {timeout: 1});
+	const stream = m(s.url, '100x100', {timeout: 1});
 
 	await Promise.race([
-		rfpify(s.once.bind(s))('/').then(() => t.fail('Expected resource timed out error')),
+		pify(s.once.bind(s), {errorFirst: false})('/').then(() => t.fail('Expected resource timed out error')),
 		t.throws(getStream(stream), `Resource timed out #1 (Network timeout on resource.) → ${s.url}/`)
 	]);
 
