@@ -134,6 +134,13 @@ Type: `string`
 
 Set a custom user agent.
 
+##### transparent
+
+Type: `Boolean`<br>
+Default: `false`
+
+Set background color to `transparent` instead of `white` if no background is set.
+
 #### .on('error', callback)
 
 Type: `Function`

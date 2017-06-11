@@ -75,13 +75,13 @@ page.open(opts.url, function (status) {
 		};
 	}
 
-	page.evaluate(function (css) {
+	page.evaluate(function (css, transparent) {
 		var bgColor = window
 			.getComputedStyle(document.body)
 			.getPropertyValue('background-color');
 
 		if (!bgColor || bgColor === 'rgba(0, 0, 0, 0)') {
-			document.body.style.backgroundColor = 'white';
+			document.body.style.backgroundColor = transparent ? 'transparent' : 'white';
 		}
 
 		if (css) {
@@ -89,7 +89,7 @@ page.open(opts.url, function (status) {
 			el.appendChild(document.createTextNode(css));
 			document.head.appendChild(el);
 		}
-	}, opts.css);
+	}, opts.css, opts.transparent);
 
 	window.setTimeout(function () {
 		if (opts.hide) {
