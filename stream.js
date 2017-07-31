@@ -59,10 +59,103 @@ page.viewportSize = {
 page.customHeaders = opts.headers || {};
 page.zoomFactor = opts.scale;
 
-page.open(opts.url, function (status) {
+var previousCount = 0;
+var previousPage = null;
+
+function pageOnLoadFinished(status) {
 	if (status === 'fail') {
 		console.error('Couldn\'t load url: ' + opts.url);
 		phantom.exit(1);
+		return;
+	}
+
+	if (previousPage === page.url) {
+		if (++ previousCount > 3) {
+			console.error('Loop detected: ' + page.url);
+			phantom.exit(1);
+			return;
+		}
+	} else {
+	   previousPage = page.url;
+	   previousCount = 0;
+	}
+
+	var threshold = 10;
+	var refresh = page.evaluate(function(threshold) {
+		var patternMetaContent = /^\s*(\d+)(?:\s*;(?:\s*url\s*=)?\s*(.+)?)?$/i;
+		var parseMetaRefresh = function (content) {
+			// base code from https://github.com/stevenvachon/http-equiv-refresh
+			var result = { timeout: null, url: null };
+
+			content = patternMetaContent.exec(content);
+
+			if (content === null) {
+				return result;
+			}
+
+			if (content[1] !== undefined) {
+				result.timeout = parseInt( content[1] );
+			}
+
+			if (content[2] !== undefined) {
+				var url = (content[2] + '').trim();
+
+				if (url.length) {
+					var firstChar = url[0];
+					var lastChar  = url[url.length-1];
+
+					// Remove a single level of encapsulating quotes
+					if (firstChar==="'" && lastChar==="'" || firstChar==='"' && lastChar==='"') {
+						if (url.length > 2) {
+							url = url.substr(1, url.length-2).trim();
+						}
+					}
+				}
+
+				if (url.length) {
+					result.url = url;
+				}
+			}
+
+			return result;
+		};
+
+		var metas = [];
+		var tags = document.head.querySelectorAll('[http-equiv="refresh"]');
+		for (var i = 0, len = tags.length; i < len; ++ i) {
+			if (tags[i].tagName === 'META') {
+			  metas.push(tags[i].content || tags[i].CONTENT);
+			}
+		};
+
+		var refresh = null;
+		var minTime = Number.POSITIVE_INFINITY;
+		var i = 0;
+
+		for (var i = 0, len = metas.length; i < len; ++ i) {
+			var currRefresh = parseMetaRefresh(metas[i]);
+
+			if (currRefresh.timeout <= threshold && currRefresh.timeout < minTime) {
+				minTime = currRefresh.timeout;
+				refreshUrl = currRefresh; // currRefresh.url could be null
+			}
+		}
+
+		return refreshUrl;
+	}, threshold);
+
+	if (null !== refresh) {
+		page.onLoadFinished = pageOnLoadFinished;
+
+		if (refresh.timeout > 0) { // when is 0, is already triggered by phantom apparently
+			page.evaluate(function (refresh) {
+				if (null === refresh.url) {
+					window.location.reload();
+				} else {
+					window.location.replace(refresh.url);
+				}
+			}, refresh);
+		}
 		return;
 	}
 
@@ -124,4 +217,7 @@ page.open(opts.url, function (status) {
 		log.call(console, page.renderBase64(opts.format));
 		phantom.exit();
 	}, opts.delay * 1000);
-});
+}
+
+page.onLoadFinished = pageOnLoadFinished;
+page.open(opts.url);
