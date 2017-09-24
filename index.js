@@ -64,7 +64,7 @@ module.exports = async (url, opts) => {
 		await page.authenticate({username, password});
 	}
 
-	if (cookies.length > 0) {
+	if (Array.isArray(cookies) && cookies.length > 0) {
 		await Promise.all(cookies.map(x => page.setCookie(parseCookie(x))));
 	}
 
