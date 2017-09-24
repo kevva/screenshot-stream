@@ -1,47 +1,102 @@
 'use strict';
-const parseResolution = require('parse-resolution');
-const Screenshot = require('./screenshot');
+const fileUrl = require('file-url');
+const isUrl = require('is-url-superb');
+const puppeteer = require('puppeteer');
+const toughCookie = require('tough-cookie');
 
-module.exports = (url, size, opts) => {
-	const {width, height} = parseResolution(size);
+const parseCookie = cookie => {
+	if (typeof cookie === 'object') {
+		return cookie;
+	}
 
+	const ret = toughCookie.parse(cookie).toJSON();
+	ret.name = ret.key;
+	return ret;
+};
+
+const hideElement = element => {
+	element.style.visibility = 'hidden';
+};
+
+const getBoundingClientRect = element => {
+	const {height, width, x, y} = element.getBoundingClientRect();
+	return {height, width, x, y};
+};
+
+module.exports = async (url, opts) => {
 	opts = Object.assign({
 		cookies: [],
-		format: 'png',
 		fullPage: true,
 		hide: [],
-		scale: 1,
-		viewport: {}
+		width: 1920,
+		height: 1080
 	}, opts);
 
-	opts.type = opts.format === 'jpg' ? 'jpeg' : opts.format;
+	const uri = isUrl(url) ? url : fileUrl(url);
+	const {
+		cookies, crop, format, headers, height, hide, password, scale,
+		script, selector, timeout, transparent, userAgent, username, width
+	} = opts;
 
-	opts.viewport = Object.assign({}, opts.viewport, {
-		width,
-		height
-	});
+	opts.type = format === 'jpg' ? 'jpeg' : format;
 
-	if (opts.crop) {
+	if (crop) {
 		opts.fullPage = false;
 	}
 
-	if (opts.scale !== 1) {
-		opts.viewport.deviceScaleFactor = opts.scale;
+	if (timeout) {
+		opts.timeout = timeout * 1000;
 	}
 
-	if (opts.transparent) {
+	if (transparent) {
 		opts.omitBackground = true;
 	}
 
-	const screenshot = new Screenshot();
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	const viewport = {
+		height,
+		width,
+		deviceScaleFactor: typeof scale === 'number' ? scale : null
+	};
 
-	return screenshot.launch()
-		.then(() => screenshot.authenticate(opts.username, opts.password)
-		.then(() => screenshot.setCookie(opts.cookies))
-		.then(() => screenshot.setHeaders(opts.headers))
-		.then(() => screenshot.setUserAgent(opts.userAgent))
-		.then(() => screenshot.open(url, opts))
-		.then(() => screenshot.hideElements(opts.hide))
-		.then(() => screenshot.getRect(opts.selector))
-		.then(clip => screenshot.screenshot(Object.assign(opts, clip))));
+	if (username && password) {
+		await page.authenticate({username, password});
+	}
+
+	if (cookies.length > 0) {
+		await Promise.all(cookies.map(x => page.setCookie(parseCookie(x))));
+	}
+
+	if (typeof headers === 'object') {
+		await page.setExtraHTTPHeaders(headers);
+	}
+
+	if (userAgent) {
+		await page.setUserAgent(userAgent);
+	}
+
+	await page.setViewport(viewport);
+	await page.goto(uri, opts);
+
+	if (script) {
+		const fn = isUrl(script) ? page.addScriptTag : script.endsWith('.js') ? page.injectFile : page.evaluate;
+		await fn(script);
+	}
+
+	if (Array.isArray(hide) && hide.length > 0) {
+		await Promise.all(hide.map(x => page.$eval(x, hideElement)));
+	}
+
+	if (selector) {
+		await page.waitForSelector(selector, {visible: true});
+
+		opts.clip = await page.$eval(selector, getBoundingClientRect);
+		opts.fullPage = false;
+	}
+
+	const buf = await page.screenshot(opts);
+	await browser.close();
+
+	return buf;
 };

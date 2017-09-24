@@ -1,8 +1,8 @@
 'use strict';
 const http = require('http');
-const cookie = require('cookie');
 const getPort = require('get-port');
 const pify = require('pify');
+const toughCookie = require('tough-cookie');
 
 module.exports = opts => {
 	opts = opts || {};
@@ -24,7 +24,7 @@ module.exports = opts => {
 		});
 
 		s.on('/cookies', (req, res) => {
-			const color = cookie.parse(req.headers.cookie).color || 'white';
+			const color = toughCookie.parse(req.headers.cookie).value || 'white';
 			const style = [
 				`background-color: ${color}; position: absolute;`,
 				'top: 0; right: 0; bottom: 0; left: 0;'
