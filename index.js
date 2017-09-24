@@ -34,7 +34,7 @@ module.exports = async (url, opts) => {
 
 	const uri = isUrl(url) ? url : fileUrl(url);
 	const {
-		cookies, crop, format, headers, height, hide, password, scale,
+		cookies, crop, format, headers, height, hide, keepAlive, password, scale,
 		script, selector, timeout, transparent, userAgent, username, width
 	} = opts;
 
@@ -52,7 +52,7 @@ module.exports = async (url, opts) => {
 		opts.omitBackground = true;
 	}
 
-	const browser = await puppeteer.launch();
+	const browser = opts.browser || await puppeteer.launch();
 	const page = await browser.newPage();
 	const viewport = {
 		height,
@@ -96,7 +96,13 @@ module.exports = async (url, opts) => {
 	}
 
 	const buf = await page.screenshot(opts);
-	await browser.close();
+	await page.close();
+
+	if (keepAlive !== true) {
+		await browser.close();
+	}
 
 	return buf;
 };
+
+module.exports.startBrowser = puppeteer.launch;

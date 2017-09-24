@@ -6,7 +6,23 @@ import isPng from 'is-png';
 import pify from 'pify';
 import PNG from 'png-js';
 import server from './fixtures/server';
-import m from '.';
+import screenshotStream, {startBrowser} from '.';
+
+let browser;
+let m;
+
+test.before(async () => {
+	browser = await startBrowser();
+
+	m = (url, opts) => screenshotStream(url, Object.assign({}, opts, {
+		browser,
+		keepAlive: true
+	}));
+});
+
+test.after(async () => {
+	await browser.close();
+});
 
 test('generate screenshot', async t => {
 	t.true(isPng(await m('http://yeoman.io', {
