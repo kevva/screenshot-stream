@@ -1,12 +1,12 @@
 # screenshot-stream [![Build Status](https://travis-ci.org/kevva/screenshot-stream.svg?branch=master)](https://travis-ci.org/kevva/screenshot-stream)
 
-> Capture screenshot of a website and return it as a stream
+> Capture screenshot of a website
 
 
 ## Install
 
 ```
-$ npm install --save screenshot-stream
+$ npm install screenshot-stream
 ```
 
 
@@ -46,7 +46,7 @@ Define options to be used.
 
 ##### crop
 
-Type: `Boolean`<br>
+Type: `boolean`<br>
 Default: `false`
 
 Crop to the set height.
@@ -79,7 +79,7 @@ Set custom headers.
 
 ##### cookies
 
-Type: `Array` or `Object`
+Type: `Array` `Object`
 
 A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
 
@@ -117,7 +117,7 @@ Set a custom user agent.
 
 ##### transparent
 
-Type: `Boolean`<br>
+Type: `boolean`<br>
 Default: `false`
 
 Set background color to `transparent` instead of `white` if no background is set.
@@ -125,7 +125,7 @@ Set background color to `transparent` instead of `white` if no background is set
 
 ## CLI
 
-See the [pageres](https://github.com/sindresorhus/pageres#usage) CLI.
+See the [Pageres CLI](https://github.com/sindresorhus/pageres-cli).
 
 
 ## License
