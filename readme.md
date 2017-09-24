@@ -16,9 +16,9 @@ $ npm install --save screenshot-stream
 const fs = require('fs');
 const screenshot = require('screenshot-stream');
 
-const stream = screenshot('http://google.com', '1024x768', {crop: true});
-
-stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
+screenshot('http://google.com', '1024x768', {crop: true}).then(data => {
+	fs.writeFileSync('google.com-1024x768.png');
+});
 ```
 
 
@@ -51,37 +51,18 @@ Default: `false`
 
 Crop to the set height.
 
-##### delay
-
-Type: `number` *(seconds)*<br>
-Default: `0`
-
-Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
-
 ##### timeout
 
 Type: `number` *(seconds)*<br>
 Default: `60`
 
-Number of seconds after which PhantomJS aborts the request.
+Number of seconds after which Google Chrome aborts the request.
 
 ##### selector
 
 Type: `string`
 
 Capture a specific DOM element.
-
-##### css
-
-Type: `string`
-
-Apply custom CSS to the webpage. Specify some CSS or the path to a CSS file.
-
-##### script
-
-Type: `string`
-
-Apply custom JavaScript to the webpage. Specify some JavaScript or the path to a file.
 
 ##### hide
 
@@ -140,18 +121,6 @@ Type: `Boolean`<br>
 Default: `false`
 
 Set background color to `transparent` instead of `white` if no background is set.
-
-#### .on('error', callback)
-
-Type: `Function`
-
-PhantomJS errors.
-
-#### .on('warning', callback)
-
-Type: `Function`
-
-Warnings with for example page errors.
 
 
 ## CLI

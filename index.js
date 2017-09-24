@@ -1,85 +1,48 @@
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const urlMod = require('url');
-const base64Stream = require('base64-stream');
-const parseCookiePhantomjs = require('parse-cookie-phantomjs');
-const phantomBridge = require('phantom-bridge');
-const byline = require('byline');
-
-const handleCookies = (cookies, url) => {
-	const parsedUrl = urlMod.parse(url);
-
-	return (cookies || []).map(x => {
-		const ret = typeof x === 'string' ? parseCookiePhantomjs(x) : x;
-
-		if (!ret.domain) {
-			ret.domain = parsedUrl.hostname;
-		}
-
-		if (!ret.path) {
-			ret.path = parsedUrl.path;
-		}
-
-		return ret;
-	});
-};
+const parseResolution = require('parse-resolution');
+const puppeteer = require('puppeteer');
+const Screenshot = require('./screenshot');
 
 module.exports = (url, size, opts) => {
+	const {width, height} = parseResolution(size);
+
 	opts = Object.assign({
-		delay: 0,
+		cookies: [],
+		format: 'png',
+		fullPage: true,
+		hide: [],
 		scale: 1,
-		format: 'png'
+		viewport: {}
 	}, opts);
 
-	const args = Object.assign(opts, {
-		url,
-		width: size.split(/x/i)[0] * opts.scale,
-		height: size.split(/x/i)[1] * opts.scale,
-		cookies: handleCookies(opts.cookies, url),
-		format: opts.format === 'jpg' ? 'jpeg' : opts.format,
-		css: /\.css$/.test(opts.css) ? fs.readFileSync(opts.css, 'utf8') : opts.css,
-		script: /\.js$/.test(opts.script) ? fs.readFileSync(opts.script, 'utf8') : opts.script
+	opts.type = opts.format === 'jpg' ? 'jpeg' : opts.format;
+
+	opts.viewport = Object.assign({}, opts.viewport, {
+		width,
+		height
 	});
 
-	const cp = phantomBridge(path.join(__dirname, 'stream.js'), [
-		'--ignore-ssl-errors=true',
-		'--local-to-remote-url-access=true',
-		'--ssl-protocol=any',
-		JSON.stringify(args)
-	]);
+	if (opts.crop) {
+		opts.fullPage = false;
+	}
 
-	const stream = base64Stream.decode();
+	if (opts.scale !== 1) {
+		opts.viewport.deviceScaleFactor = opts.scale;
+	}
 
-	process.stderr.setMaxListeners(0);
+	if (opts.transparent) {
+		opts.omitBackground = true;
+	}
 
-	cp.stderr.setEncoding('utf8');
-	cp.stdout.pipe(stream);
-
-	byline(cp.stderr).on('data', data => {
-		data = data.trim();
-
-		if (/ phantomjs\[/.test(data)) {
-			return;
-		}
-
-		if (/http:\/\/requirejs.org\/docs\/errors.html#mismatch/.test(data)) {
-			return;
-		}
-
-		if (data.startsWith('WARN: ')) {
-			stream.emit('warning', data.replace(/^WARN: /, ''));
-			stream.emit('warn', data.replace(/^WARN: /, '')); // TODO: deprecate this event in v5
-			return;
-		}
-
-		if (data.length > 0) {
-			const err = new Error(data);
-			err.noStack = true;
-			cp.stdout.unpipe(stream);
-			stream.emit('error', err);
-		}
-	});
-
-	return stream;
+	return puppeteer.launch()
+		.then(browser => browser.newPage()
+		.then(page => new Screenshot(browser, page)))
+		.then(Screenshot => Screenshot.authenticate(opts.username, opts.password)
+		.then(() => Screenshot.setCookie(opts.cookies))
+		.then(() => Screenshot.setHeaders(opts.headers))
+		.then(() => Screenshot.setUserAgent(opts.userAgent))
+		.then(() => Screenshot.open(url, opts))
+		.then(() => Screenshot.hideElements(opts.hide))
+		.then(() => Screenshot.getRect(opts.selector))
+		.then(clip => Screenshot.screenshot(Object.assign(opts, clip))));
 };

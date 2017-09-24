@@ -1,67 +1,49 @@
 {
-  "name": "screenshot-stream",
-  "version": "4.2.0",
-  "description": "Capture screenshot of a website and return it as a stream",
-  "license": "MIT",
-  "repository": "kevva/screenshot-stream",
-  "author": {
-    "name": "Kevin Mårtensson",
-    "email": "kevinmartensson@gmail.com",
-    "url": "github.com/kevva"
-  },
-  "engines": {
-    "node": ">=4"
-  },
-  "scripts": {
-    "test": "xo && ava"
-  },
-  "files": [
-    "index.js",
-    "stream.js"
-  ],
-  "keywords": [
-    "image",
-    "page",
-    "phantom",
-    "phantomjs",
-    "resolution",
-    "screen",
-    "screenshot",
-    "size",
-    "stream",
-    "url"
-  ],
-  "dependencies": {
-    "base64-stream": "^0.1.2",
-    "byline": "^4.2.1",
-    "object-assign": "^4.0.1",
-    "parse-cookie-phantomjs": "^1.0.0",
-    "phantom-bridge": "^2.0.0"
-  },
-  "devDependencies": {
-    "ava": "*",
-    "cookie": "^0.3.1",
-    "get-port": "^3.1.0",
-    "get-stream": "^3.0.0",
-    "image-size": "^0.5.4",
-    "is-jpg": "^1.0.0",
-    "is-png": "^1.0.0",
-    "pify": "^3.0.0",
-    "png-js": "^0.1.1",
-    "xo": "*"
-  },
-  "xo": {
-    "esnext": true,
-    "overrides": [
-      {
-        "files": "stream.js",
-        "esnext": false,
-        "rules": {
-          "import/no-extraneous-dependencies": 0,
-          "import/no-unresolved": 0,
-          "no-multi-assign": 0
-        }
-      }
-    ]
-  }
+	"name": "screenshot-stream",
+	"version": "4.2.0",
+	"description": "Capture screenshot of a website and return it as a stream",
+	"license": "MIT",
+	"repository": "kevva/screenshot-stream",
+	"author": {
+		"name": "Kevin Mårtensson",
+		"email": "kevinmartensson@gmail.com",
+		"url": "github.com/kevva"
+	},
+	"engines": {
+		"node": ">=6.4"
+	},
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"files": [
+		"index.js"
+	],
+	"keywords": [
+		"image",
+		"page",
+		"phantom",
+		"phantomjs",
+		"resolution",
+		"screen",
+		"screenshot",
+		"size",
+		"stream",
+		"url"
+	],
+	"dependencies": {
+		"file-url": "^2.0.2",
+		"is-url-superb": "^2.0.0",
+		"parse-resolution": "^1.0.0",
+		"puppeteer": "^0.11.0",
+		"tough-cookie": "^2.3.3"
+	},
+	"devDependencies": {
+		"ava": "*",
+		"image-size": "^0.6.1",
+		"is-jpg": "^1.0.0",
+		"is-png": "^1.1.0",
+		"pify": "^3.0.0",
+		"png-js": "^0.1.1",
+		"xo": "*"
+	}
 }
