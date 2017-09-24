@@ -17,7 +17,7 @@ const fs = require('fs');
 const screenshot = require('screenshot-stream');
 
 screenshot('http://google.com', '1024x768', {crop: true}).then(data => {
-	fs.writeFileSync('google.com-1024x768.png');
+	fs.writeFileSync('google.com-1024x768.png', data);
 });
 ```
 
