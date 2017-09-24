@@ -1,6 +1,5 @@
 'use strict';
 const parseResolution = require('parse-resolution');
-const puppeteer = require('puppeteer');
 const Screenshot = require('./screenshot');
 
 module.exports = (url, size, opts) => {
@@ -34,15 +33,15 @@ module.exports = (url, size, opts) => {
 		opts.omitBackground = true;
 	}
 
-	return puppeteer.launch()
-		.then(browser => browser.newPage()
-		.then(page => new Screenshot(browser, page)))
-		.then(Screenshot => Screenshot.authenticate(opts.username, opts.password)
-		.then(() => Screenshot.setCookie(opts.cookies))
-		.then(() => Screenshot.setHeaders(opts.headers))
-		.then(() => Screenshot.setUserAgent(opts.userAgent))
-		.then(() => Screenshot.open(url, opts))
-		.then(() => Screenshot.hideElements(opts.hide))
-		.then(() => Screenshot.getRect(opts.selector))
-		.then(clip => Screenshot.screenshot(Object.assign(opts, clip))));
+	const screenshot = new Screenshot();
+
+	return screenshot.launch()
+		.then(() => screenshot.authenticate(opts.username, opts.password)
+		.then(() => screenshot.setCookie(opts.cookies))
+		.then(() => screenshot.setHeaders(opts.headers))
+		.then(() => screenshot.setUserAgent(opts.userAgent))
+		.then(() => screenshot.open(url, opts))
+		.then(() => screenshot.hideElements(opts.hide))
+		.then(() => screenshot.getRect(opts.selector))
+		.then(clip => screenshot.screenshot(Object.assign(opts, clip))));
 };

@@ -1,11 +1,19 @@
 const toughCookie = require('tough-cookie');
 const fileUrl = require('file-url');
 const isUrl = require('is-url-superb');
+const puppeteer = require('puppeteer');
 
 module.exports = class Screenshot {
-	constructor(browser, page) {
-		this.browser = browser;
-		this.page = page;
+	launch() {
+		return puppeteer.launch()
+			.then(browser => {
+				this.browser = browser;
+				return browser.newPage();
+			})
+			.then(page => {
+				this.page = page;
+				return page;
+			});
 	}
 
 	authenticate(username, password) {
