@@ -1,12 +1,12 @@
 # screenshot-stream [![Build Status](https://travis-ci.org/kevva/screenshot-stream.svg?branch=master)](https://travis-ci.org/kevva/screenshot-stream)
 
-> Capture screenshot of a website and return it as a stream
+> Capture screenshot of a website
 
 
 ## Install
 
 ```
-$ npm install --save screenshot-stream
+$ npm install screenshot-stream
 ```
 
 
@@ -16,9 +16,9 @@ $ npm install --save screenshot-stream
 const fs = require('fs');
 const screenshot = require('screenshot-stream');
 
-const stream = screenshot('http://google.com', '1024x768', {crop: true});
-
-stream.pipe(fs.createWriteStream('google.com-1024x768.png'));
+screenshot('http://google.com', '1024x768', {crop: true}).then(data => {
+	fs.writeFileSync('google.com-1024x768.png', data);
+});
 ```
 
 
@@ -46,42 +46,23 @@ Define options to be used.
 
 ##### crop
 
-Type: `Boolean`<br>
+Type: `boolean`<br>
 Default: `false`
 
 Crop to the set height.
-
-##### delay
-
-Type: `number` *(seconds)*<br>
-Default: `0`
-
-Delay capturing the screenshot. Useful when the site does things after load that you want to capture.
 
 ##### timeout
 
 Type: `number` *(seconds)*<br>
 Default: `60`
 
-Number of seconds after which PhantomJS aborts the request.
+Number of seconds after which Google Chrome aborts the request.
 
 ##### selector
 
 Type: `string`
 
 Capture a specific DOM element.
-
-##### css
-
-Type: `string`
-
-Apply custom CSS to the webpage. Specify some CSS or the path to a CSS file.
-
-##### script
-
-Type: `string`
-
-Apply custom JavaScript to the webpage. Specify some JavaScript or the path to a file.
 
 ##### hide
 
@@ -98,7 +79,7 @@ Set custom headers.
 
 ##### cookies
 
-Type: `Array` or `Object`
+Type: `Array` `Object`
 
 A string with the same format as a [browser cookie](http://en.wikipedia.org/wiki/HTTP_cookie) or an object of what [`phantomjs.addCookie`](http://phantomjs.org/api/phantom/method/add-cookie.html) accepts.
 
@@ -136,27 +117,15 @@ Set a custom user agent.
 
 ##### transparent
 
-Type: `Boolean`<br>
+Type: `boolean`<br>
 Default: `false`
 
 Set background color to `transparent` instead of `white` if no background is set.
 
-#### .on('error', callback)
-
-Type: `Function`
-
-PhantomJS errors.
-
-#### .on('warning', callback)
-
-Type: `Function`
-
-Warnings with for example page errors.
-
 
 ## CLI
 
-See the [pageres](https://github.com/sindresorhus/pageres#usage) CLI.
+See the [Pageres CLI](https://github.com/sindresorhus/pageres-cli).
 
 
 ## License

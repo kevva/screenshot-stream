@@ -3,190 +3,255 @@ import test from 'ava';
 import imageSize from 'image-size';
 import isJpg from 'is-jpg';
 import isPng from 'is-png';
-import PNG from 'png-js';
-import getStream from 'get-stream';
+import nock from 'nock';
 import pify from 'pify';
-import server from './fixtures/server';
-import m from '.';
+import PNG from 'png-js';
+import createServer from './fixtures/server';
+import screenshotStream, {startBrowser} from '.';
+
+let browser;
+let m;
+let server;
+
+test.before(async () => {
+	browser = await startBrowser();
+	server = await createServer();
+
+	m = (url, opts) => screenshotStream(url, Object.assign({}, opts, {
+		browser,
+		keepAlive: true
+	}));
+
+	nock('http://foo.bar')
+		.get('/script.js')
+		.replyWithFile(200, path.join(__dirname, 'fixtures', 'script.js'))
+		.get('/style.css')
+		.replyWithFile(200, path.join(__dirname, 'fixtures', 'style.css'));
+});
+
+test.after(async () => {
+	await browser.close();
+	await server.close();
+});
 
 test('generate screenshot', async t => {
-	const stream = m('http://yeoman.io', '1024x768');
-	t.true(isPng(await getStream.buffer(stream)));
+	t.true(isPng(await m(server.url, {
+		width: 100,
+		height: 100
+	})));
 });
 
 test('crop image using the `crop` option', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {crop: true});
-	const size = imageSize(await getStream.buffer(stream));
+	const size = imageSize(await m(server.url, {
+		width: 1024,
+		height: 768,
+		crop: true
+	}));
+
 	t.is(size.width, 1024);
 	t.is(size.height, 768);
 });
 
 test('capture a DOM element using the `selector` option', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {
-		selector: '.page-header'
-	});
+	const size = imageSize(await m(server.url, {
+		width: 1024,
+		height: 768,
+		selector: 'div'
+	}));
 
-	const size = imageSize(await getStream.buffer(stream));
-	t.is(size.width, 1024);
-	t.is(size.height, 80);
+	t.is(size.width, 100);
+	t.is(size.height, 100);
 });
 
-test('capture a DOM element using the `selector` option only after delay', async t => {
-	const fixture = path.join(__dirname, 'fixtures', 'test-delay-element.html');
-	const stream = m(fixture, '1024x768', {
-		selector: 'div',
-		delay: 5
-	});
+test('wait for DOM element when using the `selector` option', async t => {
+	const size = imageSize(await m(`${server.url}/delay`, {
+		width: 1024,
+		height: 768,
+		selector: 'div'
+	}));
 
-	const size = imageSize(await getStream.buffer(stream));
-	t.is(size.width, 300);
-	t.is(size.height, 200);
+	t.is(size.width, 100);
+	t.is(size.height, 100);
 });
 
 test('hide elements using the `hide` option', async t => {
-	const fixture = path.join(__dirname, 'fixtures', 'test-hide-element.html');
-	const stream = m(fixture, '100x100', {hide: ['div']});
-	const png = new PNG(await getStream.buffer(stream));
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		hide: ['div']
+	}));
+
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 255);
-});
-
-test('ignore multiline page errors', async t => {
-	const fixture = path.join(__dirname, 'fixtures', 'test-error-script.html');
-	const stream = m(fixture, '100x100');
-	t.true(isPng(await getStream.buffer(stream)));
 });
 
 test('auth using the `username` and `password` options', async t => {
-	const stream = m('http://httpbin.org/basic-auth/user/passwd', '1024x768', {
+	t.true(isPng(await m('http://httpbin.org/basic-auth/user/passwd', {
+		width: 100,
+		height: 100,
 		username: 'user',
 		password: 'passwd'
-	});
-
-	const data = await pify(stream.once.bind(stream), {errorFirst: false})('data');
-	t.truthy(data.length);
+	})));
 });
 
-test('have a `delay` option', async t => {
-	const now = new Date();
-	const stream = m('http://yeoman.io', '1024x768', {delay: 2});
-	await pify(stream.once.bind(stream), {errorFirst: false})('data');
-
-	t.true((new Date()) - now > 2000);
-});
-
-test('have a `dpi` option', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {
+test('have a `scale` option', async t => {
+	const size = imageSize(await m(server.url, {
+		width: 100,
+		height: 100,
 		crop: true,
 		scale: 2
-	});
+	}));
 
-	const size = imageSize(await getStream.buffer(stream));
-	t.is(size.width, 1024 * 2);
-	t.is(size.height, 768 * 2);
+	t.is(size.width, 100 * 2);
+	t.is(size.height, 100 * 2);
 });
 
 test('have a `format` option', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {format: 'jpg'});
-	t.true(isJpg(await getStream.buffer(stream)));
+	t.true(isJpg(await m(server.url, {
+		width: 100,
+		height: 100,
+		format: 'jpg'
+	})));
 });
 
-test('have a `css` option', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {css: '.mobile-bar { background-color: red !important; }'});
-	const png = new PNG(await getStream.buffer(stream));
+test('`script` option inline', async t => {
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		script: `document.querySelector('div').style.backgroundColor = 'red';`
+	}));
+
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
 	t.is(pixels[0], 255);
 	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
 });
 
-test('have a `css` file', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {css: 'fixtures/style.css'});
-	const png = new PNG(await getStream.buffer(stream));
-	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
-	t.is(pixels[0], 0);
-	t.is(pixels[1], 128);
-	t.is(pixels[2], 0);
-});
+test('`script` option file', async t => {
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		script: 'fixtures/script.js'
+	}));
 
-test('have a `script` option', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {script: 'document.querySelector(\'.mobile-bar\').style.backgroundColor = \'red\';'});
-	const png = new PNG(await getStream.buffer(stream));
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
 	t.is(pixels[0], 255);
 	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
 });
 
-test('have a `js` file', async t => {
-	const stream = m('http://yeoman.io', '1024x768', {script: 'fixtures/script.js'});
-	const png = new PNG(await getStream.buffer(stream));
+test.skip('`script` option url', async t => { // eslint-disable-line ava/no-skip-test
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		script: 'http://foo.bar/script.js'
+	}));
+
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
-	t.is(pixels[0], 0);
-	t.is(pixels[1], 128);
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test('`style` option inline', async t => {
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		style: 'div { background-color: red !important; }'
+	}));
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test('`style` option file', async t => {
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		style: 'fixtures/style.css'
+	}));
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test.skip('`style` option url', async t => { // eslint-disable-line ava/no-skip-test
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		style: 'http://foo.bar/style.css'
+	}));
+
+	console.log(png);
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
 	t.is(pixels[2], 0);
 });
 
 test('send cookie', async t => {
-	const s = await server();
-	const stream = m(`${s.url}/cookies`, '100x100', {
+	const png = new PNG(await m(`${server.url}/cookie`, {
+		width: 100,
+		height: 100,
 		cookies: ['color=black; Path=/; Domain=localhost']
-	});
+	}));
 
-	const png = new PNG(await getStream.buffer(stream));
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
-
 	t.is(pixels[0], 0);
-	await s.close();
 });
 
 test('send cookie using an object', async t => {
-	const s = await server();
-	const stream = m(`${s.url}/cookies`, '100x100', {
+	const png = new PNG(await m(`${server.url}/cookie`, {
+		width: 100,
+		height: 100,
 		cookies: [{
 			name: 'color',
 			value: 'black',
 			domain: 'localhost'
 		}]
-	});
+	}));
 
-	const png = new PNG(await getStream.buffer(stream));
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
-
 	t.is(pixels[0], 0);
-	await s.close();
 });
 
-test('send headers', async t => {
-	const s = await server();
-
-	m(`${s.url}`, '100x100', {
+test.skip('send headers', async t => { // eslint-disable-line ava/no-skip-test
+	await m(`${server.url}`, {
+		width: 100,
+		height: 100,
 		headers: {
 			foobar: 'unicorn'
 		}
 	});
 
-	t.is((await pify(s.once.bind(s), {errorFirst: false})('/')).headers.foobar, 'unicorn');
-	await s.close();
+	t.is((await pify(server.once.bind(server), {errorFirst: false})('/headers')).headers.foobar, 'unicorn');
 });
 
 test('handle redirects', async t => {
-	const s = await server();
-	const stream = m(`${s.url}/redirect`, '100x100');
-	const png = new PNG(await getStream.buffer(stream));
+	const png = new PNG(await m(`${server.url}/redirect`, {
+		width: 100,
+		height: 100
+	}));
+
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 	t.is(pixels[0], 0);
-	await s.close();
 });
 
 test('resource timeout', async t => {
-	const s = await server({delay: 5});
-	const stream = m(s.url, '100x100', {timeout: 1});
-
-	await Promise.race([
-		pify(s.once.bind(s), {errorFirst: false})('/').then(() => t.fail('Expected resource timed out error')),
-		t.throws(getStream(stream), `Resource timed out #1 (Network timeout on resource.) → ${s.url}/`)
-	]);
-
-	await s.close();
+	await t.throws(m(`${server.url}/timeout/5`, {
+		width: 100,
+		height: 100,
+		timeout: 1
+	}), /1000ms exceeded/);
 });

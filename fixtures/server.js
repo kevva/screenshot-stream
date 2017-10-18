@@ -1,46 +1,56 @@
 'use strict';
-const http = require('http');
-const cookie = require('cookie');
-const getPort = require('get-port');
+const createTestServer = require('create-test-server');
 const pify = require('pify');
+const toughCookie = require('tough-cookie');
 
-module.exports = opts => {
-	opts = opts || {};
-
-	return getPort().then(port => {
-		const s = http.createServer((req, res) => {
-			setTimeout(() => {
-				s.emit(req.url, req, res);
-			}, (opts.delay || 0) * 1000);
-		});
-
-		s.port = port;
-		s.url = `http://localhost:${port}`;
-		s.close = pify(s.close);
-
-		s.on('/', (req, res) => {
-			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.end('<html style="background-color: black;"></html>');
-		});
-
-		s.on('/cookies', (req, res) => {
-			const color = cookie.parse(req.headers.cookie).color || 'white';
-			const style = [
-				`background-color: ${color}; position: absolute;`,
-				'top: 0; right: 0; bottom: 0; left: 0;'
-			].join(' ');
-
-			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.end(`<body><div style="${style}"></div></body>`);
-		});
-
-		s.on('/redirect', (req, res) => {
-			res.writeHead(302, {location: `http://localhost:${port}/`});
-			res.end();
-		});
-
-		s.listen(port);
-
-		return s;
+module.exports = () => createTestServer().then(server => {
+	server.get('/', (req, res) => {
+		const style = `background-color: black; width: 100px; height: 100px;`;
+		res.send(`<body style="margin: 0;"><div style="${style}"></div></body>`);
 	});
-};
+
+	server.get('/delay', (req, res) => {
+		const style = `width: 100px; height: 100px;`;
+		res.send(`
+			<body>
+				<div style="${style}"></div>
+				<script>
+					window.setTimeout(function () {
+						document.querySelector('div').style.display = 'block';
+					}, 5000);
+				</script>
+			</body>
+		`);
+	});
+
+	server.get('/cookie', (req, res) => {
+		const color = toughCookie.parse(req.headers.cookie).value || 'white';
+		const style = `
+			background-color: ${color};
+			bottom: 0;
+			left: 0;
+			position: absolute;
+			right: 0;
+			top: 0;
+		`;
+
+		res.send(`<body><div style="${style}"></div></body>`);
+	});
+
+	server.get('/headers', (req, res) => {
+		server.emit('headers', req);
+		res.end();
+	});
+
+	server.get('/redirect', (req, res) => {
+		res.redirect(server.url);
+	});
+
+	server.get('/timeout/:delay', (req, res) => {
+		setTimeout(() => {
+			res.end();
+		}, req.params.delay * 1000);
+	});
+
+	return server;
+});

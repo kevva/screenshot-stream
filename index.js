@@ -1,85 +1,117 @@
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const urlMod = require('url');
-const base64Stream = require('base64-stream');
-const parseCookiePhantomjs = require('parse-cookie-phantomjs');
-const phantomBridge = require('phantom-bridge');
-const byline = require('byline');
+const fileUrl = require('file-url');
+const isUrl = require('is-url-superb');
+const puppeteer = require('puppeteer');
+const toughCookie = require('tough-cookie');
 
-const handleCookies = (cookies, url) => {
-	const parsedUrl = urlMod.parse(url);
+const parseCookie = cookie => {
+	if (typeof cookie === 'object') {
+		return cookie;
+	}
 
-	return (cookies || []).map(x => {
-		const ret = typeof x === 'string' ? parseCookiePhantomjs(x) : x;
-
-		if (!ret.domain) {
-			ret.domain = parsedUrl.hostname;
-		}
-
-		if (!ret.path) {
-			ret.path = parsedUrl.path;
-		}
-
-		return ret;
-	});
+	const ret = toughCookie.parse(cookie).toJSON();
+	ret.name = ret.key;
+	return ret;
 };
 
-module.exports = (url, size, opts) => {
+const hideElement = element => {
+	element.style.visibility = 'hidden';
+};
+
+const getBoundingClientRect = element => {
+	const {height, width, x, y} = element.getBoundingClientRect();
+	return {height, width, x, y};
+};
+
+module.exports = async (url, opts) => {
 	opts = Object.assign({
-		delay: 0,
-		scale: 1,
-		format: 'png'
+		cookies: [],
+		fullPage: true,
+		hide: [],
+		width: 1920,
+		height: 1080
 	}, opts);
 
-	const args = Object.assign(opts, {
-		url,
-		width: size.split(/x/i)[0] * opts.scale,
-		height: size.split(/x/i)[1] * opts.scale,
-		cookies: handleCookies(opts.cookies, url),
-		format: opts.format === 'jpg' ? 'jpeg' : opts.format,
-		css: /\.css$/.test(opts.css) ? fs.readFileSync(opts.css, 'utf8') : opts.css,
-		script: /\.js$/.test(opts.script) ? fs.readFileSync(opts.script, 'utf8') : opts.script
-	});
+	const uri = isUrl(url) ? url : fileUrl(url);
+	const {
+		cookies, crop, format, headers, height, hide, keepAlive, password, scale,
+		script, selector, style, timeout, transparent, userAgent, username, width
+	} = opts;
 
-	const cp = phantomBridge(path.join(__dirname, 'stream.js'), [
-		'--ignore-ssl-errors=true',
-		'--local-to-remote-url-access=true',
-		'--ssl-protocol=any',
-		JSON.stringify(args)
-	]);
+	opts.type = format === 'jpg' ? 'jpeg' : format;
 
-	const stream = base64Stream.decode();
+	if (crop) {
+		opts.fullPage = false;
+	}
 
-	process.stderr.setMaxListeners(0);
+	if (timeout) {
+		opts.timeout = timeout * 1000;
+	}
 
-	cp.stderr.setEncoding('utf8');
-	cp.stdout.pipe(stream);
+	if (transparent) {
+		opts.omitBackground = true;
+	}
 
-	byline(cp.stderr).on('data', data => {
-		data = data.trim();
+	const browser = opts.browser || await puppeteer.launch();
+	const page = await browser.newPage();
+	const viewport = {
+		height,
+		width,
+		deviceScaleFactor: typeof scale === 'number' ? scale : null
+	};
 
-		if (/ phantomjs\[/.test(data)) {
-			return;
+	if (username && password) {
+		await page.authenticate({username, password});
+	}
+
+	if (Array.isArray(cookies) && cookies.length > 0) {
+		await Promise.all(cookies.map(x => page.setCookie(parseCookie(x))));
+	}
+
+	if (typeof headers === 'object') {
+		await page.setExtraHTTPHeaders(headers);
+	}
+
+	if (userAgent) {
+		await page.setUserAgent(userAgent);
+	}
+
+	await page.setViewport(viewport);
+	await page.goto(uri, opts);
+
+	if (script) {
+		const key = isUrl(script) ? 'url' : script.endsWith('.js') ? 'path' : 'content';
+		await page.addScriptTag({[key]: script});
+	}
+
+	if (style) {
+		const key = isUrl(style) ? 'url' : style.endsWith('.css') ? 'path' : 'content';
+		await page.addStyleTag({[key]: style});
+
+		if (isUrl(style)) {
+			console.log(key, style);
 		}
+	}
 
-		if (/http:\/\/requirejs.org\/docs\/errors.html#mismatch/.test(data)) {
-			return;
-		}
+	if (Array.isArray(hide) && hide.length > 0) {
+		await Promise.all(hide.map(x => page.$eval(x, hideElement)));
+	}
 
-		if (data.startsWith('WARN: ')) {
-			stream.emit('warning', data.replace(/^WARN: /, ''));
-			stream.emit('warn', data.replace(/^WARN: /, '')); // TODO: deprecate this event in v5
-			return;
-		}
+	if (selector) {
+		await page.waitForSelector(selector, {visible: true});
 
-		if (data.length > 0) {
-			const err = new Error(data);
-			err.noStack = true;
-			cp.stdout.unpipe(stream);
-			stream.emit('error', err);
-		}
-	});
+		opts.clip = await page.$eval(selector, getBoundingClientRect);
+		opts.fullPage = false;
+	}
 
-	return stream;
+	const buf = await page.screenshot(opts);
+	await page.close();
+
+	if (keepAlive !== true) {
+		await browser.close();
+	}
+
+	return buf;
 };
+
+module.exports.startBrowser = puppeteer.launch;

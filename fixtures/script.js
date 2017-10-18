@@ -1,1 +1,1 @@
-document.querySelector('.mobile-bar').style.backgroundColor = 'green';
+document.querySelector('div').style.backgroundColor = 'red';
