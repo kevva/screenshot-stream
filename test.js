@@ -1,7 +1,9 @@
+import path from 'path';
 import test from 'ava';
 import imageSize from 'image-size';
 import isJpg from 'is-jpg';
 import isPng from 'is-png';
+import nock from 'nock';
 import pify from 'pify';
 import PNG from 'png-js';
 import createServer from './fixtures/server';
@@ -19,6 +21,12 @@ test.before(async () => {
 		browser,
 		keepAlive: true
 	}));
+
+	nock('http://foo.bar')
+		.get('/script.js')
+		.replyWithFile(200, path.join(__dirname, 'fixtures', 'script.js'))
+		.get('/style.css')
+		.replyWithFile(200, path.join(__dirname, 'fixtures', 'style.css'));
 });
 
 test.after(async () => {
@@ -106,11 +114,11 @@ test('have a `format` option', async t => {
 	})));
 });
 
-test.failing('have a `script` option', async t => {
+test('`script` option inline', async t => {
 	const png = new PNG(await m(server.url, {
 		width: 100,
 		height: 100,
-		script: `document.querySelector('div').style.backgroundColor = red;`
+		script: `document.querySelector('div').style.backgroundColor = 'red';`
 	}));
 
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
@@ -120,12 +128,70 @@ test.failing('have a `script` option', async t => {
 	t.is(pixels[2], 0);
 });
 
-test.failing('have a `js` file', async t => {
+test('`script` option file', async t => {
 	const png = new PNG(await m(server.url, {
 		width: 100,
 		height: 100,
 		script: 'fixtures/script.js'
 	}));
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test.skip('`script` option url', async t => { // eslint-disable-line ava/no-skip-test
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		script: 'http://foo.bar/script.js'
+	}));
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test('`style` option inline', async t => {
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		style: 'div { background-color: red !important; }'
+	}));
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test('`style` option file', async t => {
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		style: 'fixtures/style.css'
+	}));
+
+	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
+
+	t.is(pixels[0], 255);
+	t.is(pixels[1], 0);
+	t.is(pixels[2], 0);
+});
+
+test.skip('`style` option url', async t => { // eslint-disable-line ava/no-skip-test
+	const png = new PNG(await m(server.url, {
+		width: 100,
+		height: 100,
+		style: 'http://foo.bar/style.css'
+	}));
+
+	console.log(png);
 
 	const pixels = await pify(png.decode.bind(png), {errorFirst: false})();
 

@@ -35,7 +35,7 @@ module.exports = async (url, opts) => {
 	const uri = isUrl(url) ? url : fileUrl(url);
 	const {
 		cookies, crop, format, headers, height, hide, keepAlive, password, scale,
-		script, selector, timeout, transparent, userAgent, username, width
+		script, selector, style, timeout, transparent, userAgent, username, width
 	} = opts;
 
 	opts.type = format === 'jpg' ? 'jpeg' : format;
@@ -80,8 +80,17 @@ module.exports = async (url, opts) => {
 	await page.goto(uri, opts);
 
 	if (script) {
-		const fn = isUrl(script) ? page.addScriptTag : script.endsWith('.js') ? page.injectFile : page.evaluate;
-		await fn(script);
+		const key = isUrl(script) ? 'url' : script.endsWith('.js') ? 'path' : 'content';
+		await page.addScriptTag({[key]: script});
+	}
+
+	if (style) {
+		const key = isUrl(style) ? 'url' : style.endsWith('.css') ? 'path' : 'content';
+		await page.addStyleTag({[key]: style});
+
+		if (isUrl(style)) {
+			console.log(key, style);
+		}
 	}
 
 	if (Array.isArray(hide) && hide.length > 0) {
