@@ -50,7 +50,7 @@ module.exports = (url, size, opts) => {
 	]);
 
 	const stream = base64Stream.decode();
-	stream.phantom=cp; //phantom instance
+	stream.phantom = cp;
 
 	process.stderr.setMaxListeners(0);
 
